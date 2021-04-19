@@ -10,10 +10,6 @@ public class InfectionCard : Card
         this.name = name;
     }
 
-    public string getName(){
-        return name;
-    }
-
     public int getId(){
         return id;
     }

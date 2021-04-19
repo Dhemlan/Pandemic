@@ -14,8 +14,10 @@ public class GameFlowManager : MonoBehaviour
     }
 
     private void gameFlow(){
+        for (int i = 0; i < 5; i++){
             board.movePhase();
             board.drawPhase();
             board.infectionPhase();
+        }
     }
 }
