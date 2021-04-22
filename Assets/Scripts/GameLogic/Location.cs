@@ -5,6 +5,7 @@ using UnityEngine;
 public class Location : MonoBehaviour
 {
     public LocationUI locUi;
+    public ConstantVals.Colour colour;
     int[] diseaseCubes = {0,0,0,0};
     
     
@@ -14,15 +15,14 @@ public class Location : MonoBehaviour
         
     }
 
-    public void addCube(ConstantVals.Colour Colour){
-        diseaseCubes[(int)Colour]++;
+    public void addCube(ConstantVals.Colour colour){
+        diseaseCubes[(int)colour]++;
         //locUi.addCube(Colour);
-        Debug.Log("Cube added in " + gameObject.name + ": Count = " + diseaseCubes[0]);
+        //Debug.Log(colour + " Cube added in " + gameObject.name + ": yellow " + diseaseCubes[0] +" blue " + diseaseCubes[1]);
     }
 
-    public bool checkOutbreak(ConstantVals.Colour Colour){
-        if (diseaseCubes[(int)Colour] == ConstantVals.OUTBREAK_THRESHOLD){
-            Debug.Log("Outbreak");
+    public bool checkOutbreak(ConstantVals.Colour colour){
+        if (diseaseCubes[(int)colour] == ConstantVals.OUTBREAK_THRESHOLD){
             return true;
         }
         return false;
@@ -30,5 +30,9 @@ public class Location : MonoBehaviour
 
     public string getName(){
         return gameObject.name;
+    }
+
+    public ConstantVals.Colour getColour(){
+        return colour;
     }
 }
