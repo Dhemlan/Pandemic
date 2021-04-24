@@ -18,12 +18,10 @@ public class GameFlowManager : MonoBehaviour
 
 
     private IEnumerator gameFlow(){
-        Debug.Log("starting");
         for (int i = 0; i < 5; i++){
         board.movePhase();
-        board.drawPhase();
+        yield return StartCoroutine(board.drawPhase());
         yield return StartCoroutine(board.infectionPhase());
-        Debug.Log("successful");
         }
         yield break;
     }

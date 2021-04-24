@@ -16,7 +16,8 @@ public class FullScreenBackground : MonoBehaviour {
             scale *= cameraSize.y / spriteSize.y;
         }
         
-        transform.position = Vector2.zero; // Optional
+        transform.position = new Vector3 (0,0,60); // Optional
         transform.localScale = scale;
     }
+
 }

@@ -5,6 +5,7 @@ using System;
 
 public class Board : MonoBehaviour
 {
+    public BoardUI boardUI;
     public GameFlowManager gameFlowManager;
     
     private Stack<InfectionCard> infectionDeck = new Stack<InfectionCard>();
@@ -33,12 +34,18 @@ public class Board : MonoBehaviour
         
     }
 
-    public void drawPhase(){
-        for (int i = 0; i < 2; i++){
+    public IEnumerator drawPhase(){
+        List<PlayerCard> drawnCards = new List<PlayerCard>();
             try {
-                PlayerCard drawn = playerDeck.Pop();
-                            
-                Debug.Log("Player draws " + drawn.getName());   
+                drawnCards.Add(playerDeck.Pop()); 
+                drawnCards.Add(playerDeck.Pop());
+            }
+            catch(InvalidOperationException){
+                gameFlowManager.gameOver(ConstantVals.GAME_OVER_CARDS);
+            }                     
+            yield return StartCoroutine(boardUI.playerDraw());
+            foreach (PlayerCard drawn in drawnCards){
+                Debug.Log("Player draws " + drawn.getName());
                 if(drawn.getId() == ConstantVals.EPIDEMIC){
                     // Increase Step
                     infectionRateTrackIndex++;
@@ -57,39 +64,29 @@ public class Board : MonoBehaviour
                 }
                 else {
                     // add to hand
-                } 
+                }
             }
-            catch(InvalidOperationException){
-                gameFlowManager.gameOver(ConstantVals.GAME_OVER_CARDS);
-            }
-        }      
     }
 
     public IEnumerator infectionPhase(){
         for (int i = 0; i < infectionRateTrack[infectionRateTrackIndex]; i++){
             InfectionCard drawn = infectionDeck.Pop(); 
             Debug.Log("Infection: " + drawn.getName());
-            Debug.Log("waiting");
-            yield return new WaitForSeconds(2);
-            Debug.Log("Done waiting");
+            yield return StartCoroutine(boardUI.infectionDraw());
             Location loc = locations[drawn.getId()]; 
-            addCube(loc, loc.getColour(), drawn.getId());
+            yield return StartCoroutine(addCube(loc, loc.getColour(), drawn.getId()));
             infectionDiscardPile.Add(drawn);
             outbreakCitiesThisMove.Clear();
         }
     }
 
-    public IEnumerator test(){
-        Debug.Log("testing");
-        yield return new WaitForSeconds(1);
-    }
-
-    public void addCube(Location loc, ConstantVals.Colour colour, int locId){
+    public IEnumerator addCube(Location loc, ConstantVals.Colour colour, int locId){
         if (loc.checkOutbreak(colour)){
             outbreakOccurs(loc, colour, locId);
         }
         else {
             loc.addCube(colour);
+            yield return StartCoroutine(boardUI.addCube(loc, colour));
             diseaseCubeSupply[(int)colour]--;
             Debug.Log(diseaseCubeSupply[0] + " " + diseaseCubeSupply[1]);
             if (diseaseCubeSupply[(int)colour] == 0){
@@ -97,6 +94,7 @@ public class Board : MonoBehaviour
                 //gameFlowManager.gameOver(ConstantVals.GAME_OVER_CUBES);       
             }
         }
+        yield break;
     }
     
     public void outbreakOccurs(Location loc, ConstantVals.Colour cubeColour, int locId){
@@ -124,7 +122,6 @@ public class Board : MonoBehaviour
 
     private void generateDecks(){
         int i = 0;
-
         List<PlayerCard> cityCards = new List<PlayerCard>();
         List<InfectionCard> infectionCards = new List<InfectionCard>();
         foreach (string s in ConstantVals.cities){
@@ -137,9 +134,7 @@ public class Board : MonoBehaviour
     }
 
     public void createInfectionDeck(List<InfectionCard> infectionCards){
-        // Infection Deck
         Utils.ShuffleAndPlaceOnTop(infectionCards, infectionDeck);
-
         // Set aside "bottom" cards for epidemic draws
         for (int i = 0; i < epidemicCardCount; i++){
             EpidemicInfectionCards.Push(infectionDeck.Pop());
@@ -164,8 +159,7 @@ public class Board : MonoBehaviour
 
     private void setUpLocations(){
         locations = GameObject.Find("Locations").GetComponentsInChildren<Location>();
-        foreach (Location loc in locations){
-            
+        foreach (Location loc in locations){         
         }
     }
 

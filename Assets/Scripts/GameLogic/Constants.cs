@@ -7,8 +7,6 @@ public class ConstantVals
     public static string[] cities = {"Johannesburg", "Khartoum", "Kinshasa", "Lagos", "Sao Paulo","Buenos Aires","Bogata","Lima","Santiago","Mexico City","Miami",
         "Los Angeles","San Francisco","Chicago","Atlanta","Washington"};
 
-
-    
     public static int[][] locNeighbours = 
         new int[][] {new int[]{KHARTOUM,KINSHASA},new int[]{},new int[]{JOHANNESBURG,KHARTOUM,LAGOS},
                             new int[]{JOHANNESBURG,KINSHASA,SAO_PAULO},new int[]{},new int[]{SAO_PAULO,BOGATA},
@@ -25,6 +23,8 @@ public class ConstantVals
     public const int CARDS_PER_INITIAL_INFECTION_ROUND = 3;
     public const int OUTBREAK_COUNT_LIMIT = 8;
     public const int INITIAL_DISEASE_CUBE_COUNT = 20;
+
+    public const float GENERIC_WAIT_TIME = 1.0f;
 
     public const string GAME_OVER_OUTBREAKS = "Frequent outbreaks have made the disease uncontainable\nGame Over";
     public const string GAME_OVER_CUBES = "One of the diseases has taken over\nGame Over";
