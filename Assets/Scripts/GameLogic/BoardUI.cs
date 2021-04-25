@@ -8,7 +8,8 @@ public class BoardUI : MonoBehaviour
     public GameObject infectionCard;
     public GameObject playerCard1;
     public GameObject playerCard2;
-    public GameObject cubePrefab;
+    public GameObject exampleLocation;
+    public GameObject[] cubePrefabs;
 
     public GameObject playerDiscard;
     public GameObject playerDeck;
@@ -27,6 +28,7 @@ public class BoardUI : MonoBehaviour
     private Vector3 mapCentreRight;
     private Vector3 infectionDiscardCentre;
     private Vector3 playerDiscardCentre;
+    
 
     public void Start(){
         mapCentre = new Vector3(map.transform.position.x, map.transform.position.y,0);
@@ -67,15 +69,18 @@ public class BoardUI : MonoBehaviour
 
     public IEnumerator addCube(Location loc, ConstantVals.Colour colour){
         Debug.Log("adding cube ui");
-        //cube.GetComponent<SpriteRenderer>().enabled = true;
-        GameObject diseaseCube = Instantiate(cubePrefab, new Vector3(10,10,0), Quaternion.identity);
-        diseaseCube.transform.SetParent(loc.transform);
-        diseaseCube.transform.position = new Vector3(loc.transform.position.x, loc.transform.position.y - 2.0f, 0);
         
-        float pos = -1;
-        foreach (Transform child in loc.transform){
-            child.transform.position = new Vector3(pos, child.transform.position.y, 0);
-            pos *= -1;
+        GameObject diseaseCube = Instantiate(cubePrefabs[(int)colour], new Vector3(10,10,0), Quaternion.identity);
+        diseaseCube.transform.SetParent(loc.transform);
+        float width = exampleLocation.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        
+        Transform[] cubes = loc.transform.GetComponentsInChildren<Transform>();
+        float space = 2 * width / cubes.Length;
+        float pos = space * (cubes.Length - 1) / 2f;
+        
+        for (int i = 1; i < cubes.Length; i++){
+            cubes[i].transform.position = new Vector3(loc.transform.position.x - pos, loc.transform.position.y - width, 0);
+            pos -= space;
         }
         yield return new WaitForSeconds(1);
     }

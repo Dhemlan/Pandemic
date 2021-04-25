@@ -18,7 +18,8 @@ public class GameFlowManager : MonoBehaviour
 
 
     private IEnumerator gameFlow(){
-        for (int i = 0; i < 5; i++){
+        board.infectCities();
+        for (int i = 0; i < 10; i++){
         board.movePhase();
         yield return StartCoroutine(board.drawPhase());
         yield return StartCoroutine(board.infectionPhase());

@@ -17,6 +17,7 @@ public class Board : MonoBehaviour
     private List<PlayerCard> eventCardsInHands = new List<PlayerCard>();
     
     private Location[] locations;
+    private GameObject[] locObjects;
     private int[][] neighbours = ConstantVals.locNeighbours;
     private List<int> outbreakCitiesThisMove = new List<int>();
 
@@ -88,7 +89,6 @@ public class Board : MonoBehaviour
             loc.addCube(colour);
             yield return StartCoroutine(boardUI.addCube(loc, colour));
             diseaseCubeSupply[(int)colour]--;
-            Debug.Log(diseaseCubeSupply[0] + " " + diseaseCubeSupply[1]);
             if (diseaseCubeSupply[(int)colour] == 0){
                 Debug.Log("out of " + colour);
                 //gameFlowManager.gameOver(ConstantVals.GAME_OVER_CUBES);       
@@ -117,7 +117,6 @@ public class Board : MonoBehaviour
     private void boardSetUp(){
         generateDecks();
         setUpLocations();
-        infectCities();
     }
 
     private void generateDecks(){
@@ -163,14 +162,15 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void infectCities(){
+    public void infectCities(){
         for (int i = ConstantVals.INITIAL_INFECTION_ROUNDS; i > 0; i--){
             for (int j = 0; j < ConstantVals.CARDS_PER_INITIAL_INFECTION_ROUND; j++){
                 InfectionCard drawn = infectionDeck.Pop();
                 Location loc = locations[drawn.getId()];
-                //Debug.Log("Initial infection in " + drawn.getName());
+                Debug.Log("Initial infection in " + drawn.getName());
                 for (int k = 0; k < i; k++){
                     loc.addCube(loc.getColour());
+                    StartCoroutine(boardUI.addCube(loc, loc.getColour()));
                     diseaseCubeSupply[(int)loc.getColour()]--;
                 }
                 infectionDiscardPile.Add(drawn);
