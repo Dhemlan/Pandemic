@@ -43,13 +43,16 @@ public class Board : MonoBehaviour
             }
             catch(InvalidOperationException){
                 gameFlowManager.gameOver(ConstantVals.GAME_OVER_CARDS);
-            }                     
+            } 
+            boardUI.setPlayerDeckCount(playerDeck.Count);                   
             yield return StartCoroutine(boardUI.playerDraw());
+            
             foreach (PlayerCard drawn in drawnCards){
                 Debug.Log("Player draws " + drawn.getName());
                 if(drawn.getId() == ConstantVals.EPIDEMIC){
                     // Increase Step
                     infectionRateTrackIndex++;
+                    boardUI.advanceInfectionRateTrack();
 
                     // Infect Step
                     InfectionCard epidemicDrawn = EpidemicInfectionCards.Pop();
@@ -87,12 +90,14 @@ public class Board : MonoBehaviour
         }
         else {
             loc.addCube(colour);
-            yield return StartCoroutine(boardUI.addCube(loc, colour));
             diseaseCubeSupply[(int)colour]--;
+            boardUI.setCubeCount(colour, diseaseCubeSupply[(int)colour]);
+            
             if (diseaseCubeSupply[(int)colour] == 0){
                 Debug.Log("out of " + colour);
                 //gameFlowManager.gameOver(ConstantVals.GAME_OVER_CUBES);       
             }
+            yield return StartCoroutine(boardUI.addCube(loc, colour));
         }
         yield break;
     }
@@ -101,6 +106,7 @@ public class Board : MonoBehaviour
         if (!outbreakCitiesThisMove.Contains(locId)){
             outbreakCount++;
             Debug.Log("Outbreak #" + outbreakCount + " in " + loc.getName());
+            boardUI.increaseOutbreakCounter(outbreakCount);
             if (outbreakCount == ConstantVals.OUTBREAK_COUNT_LIMIT) {
                 gameFlowManager.gameOver(ConstantVals.GAME_OVER_OUTBREAKS);
                 return;
@@ -109,7 +115,7 @@ public class Board : MonoBehaviour
             outbreakCitiesThisMove.Add(locId);
             for (int i = 0; i < neighbours[locId].Length; i++){
                 int newLoc = neighbours[locId][i];
-                 addCube(locations[newLoc], cubeColour, newLoc);
+                addCube(locations[newLoc], cubeColour, newLoc);
             }
         }
     }
@@ -128,8 +134,11 @@ public class Board : MonoBehaviour
             cityCards.Add(new PlayerCard(i, s));
             i++;
         }
+        Debug.Log("raw player cards" + cityCards.Count);
         createInfectionDeck(infectionCards);
         createPlayerDeck(cityCards);
+        Debug.Log("player deck after creation" + playerDeck.Count);
+        boardUI.setPlayerDeckCount(playerDeck.Count);
     }
 
     public void createInfectionDeck(List<InfectionCard> infectionCards){
@@ -142,8 +151,7 @@ public class Board : MonoBehaviour
 
     public void createPlayerDeck(List<PlayerCard> cityCards){
         Stack<PlayerCard> shuffledPlayerCards = new Stack<PlayerCard>();
-        Utils.ShuffleAndPlaceOnTop(cityCards, shuffledPlayerCards);
-        
+        Utils.ShuffleAndPlaceOnTop(cityCards, shuffledPlayerCards);    
         // Create  and stack epidemic card piles with smallest piles at the bottom
         for (int k = 0; k < epidemicCardCount; k++){
             int pileSize = shuffledPlayerCards.Count / epidemicCardCount;
@@ -162,16 +170,20 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void infectCities(){
+    public IEnumerator infectCities(){
         for (int i = ConstantVals.INITIAL_INFECTION_ROUNDS; i > 0; i--){
             for (int j = 0; j < ConstantVals.CARDS_PER_INITIAL_INFECTION_ROUND; j++){
                 InfectionCard drawn = infectionDeck.Pop();
+                yield return StartCoroutine(boardUI.infectionDraw());
                 Location loc = locations[drawn.getId()];
                 Debug.Log("Initial infection in " + drawn.getName());
                 for (int k = 0; k < i; k++){
-                    loc.addCube(loc.getColour());
+                    /*loc.addCube(loc.getColour());
                     StartCoroutine(boardUI.addCube(loc, loc.getColour()));
                     diseaseCubeSupply[(int)loc.getColour()]--;
+                    */
+                    
+                    yield return StartCoroutine(addCube(loc, loc.getColour(), drawn.getId()));
                 }
                 infectionDiscardPile.Add(drawn);
             }

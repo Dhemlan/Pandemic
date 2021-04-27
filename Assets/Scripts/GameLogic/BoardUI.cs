@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BoardUI : MonoBehaviour
 {
@@ -11,13 +12,18 @@ public class BoardUI : MonoBehaviour
     public GameObject exampleLocation;
     public GameObject[] cubePrefabs;
 
+    public Text[] cubeReserveText;
+    public Text outbreaksCounterText;
+    public Text playerDeckCountText;
+
     public GameObject playerDiscard;
     public GameObject playerDeck;
     public GameObject infectionDeck;
     public GameObject infectionDiscard;
 
-    public GameObject infectionMarker;
-
+    public GameObject infectionRateMarker;
+    public GameObject curInfectionRateCircle;
+    
     public Sprite playerCardFace;
     public Sprite playerCardBack;
     public Sprite infectionCardface;
@@ -54,9 +60,19 @@ public class BoardUI : MonoBehaviour
         yield break;
     } 
 
+    public void setPlayerDeckCount(int newCount){
+        playerDeckCountText.text = newCount + "";
+    }
+
+    public void advanceInfectionRateTrack(){
+        curInfectionRateCircle = curInfectionRateCircle.GetComponent<InfectionTrackLink>().next();
+        infectionRateMarker.transform.SetParent(curInfectionRateCircle.transform);
+        infectionRateMarker.transform.localPosition = Vector3.zero;
+    }
+
     public IEnumerator infectionDraw(){
         infectionCard.GetComponent<SpriteRenderer>().enabled = true;
-        yield return new WaitForSeconds(0.15f);
+        yield return new WaitForSeconds(0.2f);
         //infectionCard.transform.SetParent(map.transform);
         yield return StartCoroutine(moveCardToCentre(infectionCard.transform, mapCentre, infectionCardface, new Vector3(1,1,1)));
         
@@ -68,8 +84,6 @@ public class BoardUI : MonoBehaviour
     }
 
     public IEnumerator addCube(Location loc, ConstantVals.Colour colour){
-        Debug.Log("adding cube ui");
-        
         GameObject diseaseCube = Instantiate(cubePrefabs[(int)colour], new Vector3(10,10,0), Quaternion.identity);
         diseaseCube.transform.SetParent(loc.transform);
         float width = exampleLocation.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
@@ -85,6 +99,14 @@ public class BoardUI : MonoBehaviour
         yield return new WaitForSeconds(1);
     }
 
+    public void increaseOutbreakCounter(int newCount){
+        outbreaksCounterText.text = newCount + "/8";
+    }
+
+    public void setCubeCount(ConstantVals.Colour colour, int count){
+        cubeReserveText[(int)colour].text = count + "";
+    }
+
     public IEnumerator moveCardToCentre(Transform transform, Vector3 position, Sprite cardFace, Vector3 scale){
         var currentPos = transform.position;
         var t = 0f;
@@ -92,12 +114,15 @@ public class BoardUI : MonoBehaviour
         {
                 t += Time.deltaTime / ConstantVals.GENERIC_WAIT_TIME;
                 transform.position = Vector3.Lerp(currentPos, position, t);
+                
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(new Vector3(0,180,0)), t);
+                
                 transform.localScale =  Vector3.Lerp(transform.localScale, scale, t);
                 infectionCard.GetComponent<SpriteRenderer>().sprite = cardFace;  
                 yield return null;
         }
     }
+    
     public IEnumerator moveToDiscard(Transform transform, Vector3 position){ 
         var currentPos = transform.position;
         var currentScale = transform.localScale;
