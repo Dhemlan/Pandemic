@@ -81,7 +81,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _InvFade: 1
+    - _InvFade: 0.37
     - _LightingEnabled: 1
     - _Metallic: 0
     - _Mode: 0
@@ -108,4 +108,4 @@ Material:
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
     - _SoftParticleFadeParams: {r: 0, g: 0, b: 0, a: 0}
-    - _TintColor: {r: 0.5943396, g: 0.57336295, b: 0, a: 1}
+    - _TintColor: {r: 0.2735849, g: 0.25003645, b: 0.040005337, a: 1}

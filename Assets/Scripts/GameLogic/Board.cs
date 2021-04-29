@@ -45,7 +45,7 @@ public class Board : MonoBehaviour
                 gameFlowManager.gameOver(ConstantVals.GAME_OVER_CARDS);
             } 
             boardUI.setPlayerDeckCount(playerDeck.Count);                   
-            yield return StartCoroutine(boardUI.playerDraw());
+            yield return StartCoroutine(boardUI.playerDraw(drawnCards[0].getName(), drawnCards[1].getName()));
             
             foreach (PlayerCard drawn in drawnCards){
                 Debug.Log("Player draws " + drawn.getName());
@@ -57,10 +57,13 @@ public class Board : MonoBehaviour
                     // Infect Step
                     InfectionCard epidemicDrawn = EpidemicInfectionCards.Pop();
                     Location loc = locations[epidemicDrawn.getId()];
+                    infectionDiscardPile.Add(epidemicDrawn);
+                    yield return StartCoroutine(boardUI.infectionDraw(loc.getName(), loc.getColour()));
                     for (int j = 0; j < ConstantVals.CUBES_PER_EPIDEMIC_INFECT; j++){
                         addCube(loc, loc.getColour(), epidemicDrawn.getId());
+                        yield return StartCoroutine(boardUI.addCube(loc, loc.getColour()));
                     }
-                    infectionDiscardPile.Add(epidemicDrawn);
+                    
                     outbreakCitiesThisMove.Clear();
 
                     //Intensify Step
@@ -76,10 +79,10 @@ public class Board : MonoBehaviour
         for (int i = 0; i < infectionRateTrack[infectionRateTrackIndex]; i++){
             InfectionCard drawn = infectionDeck.Pop(); 
             Debug.Log("Infection: " + drawn.getName());
-            yield return StartCoroutine(boardUI.infectionDraw());
-            Location loc = locations[drawn.getId()]; 
-            yield return StartCoroutine(addCube(loc, loc.getColour(), drawn.getId()));
+            Location loc = locations[drawn.getId()];
             infectionDiscardPile.Add(drawn);
+            yield return StartCoroutine(boardUI.infectionDraw(drawn.getName(), loc.getColour()));
+            yield return StartCoroutine(addCube(loc, loc.getColour(), drawn.getId()));
             outbreakCitiesThisMove.Clear();
         }
     }
@@ -174,18 +177,20 @@ public class Board : MonoBehaviour
         for (int i = ConstantVals.INITIAL_INFECTION_ROUNDS; i > 0; i--){
             for (int j = 0; j < ConstantVals.CARDS_PER_INITIAL_INFECTION_ROUND; j++){
                 InfectionCard drawn = infectionDeck.Pop();
-                yield return StartCoroutine(boardUI.infectionDraw());
                 Location loc = locations[drawn.getId()];
+                infectionDiscardPile.Add(drawn);
+                yield return StartCoroutine(boardUI.infectionDraw(drawn.getName(), loc.getColour()));
+                
                 Debug.Log("Initial infection in " + drawn.getName());
                 for (int k = 0; k < i; k++){
                     /*loc.addCube(loc.getColour());
                     StartCoroutine(boardUI.addCube(loc, loc.getColour()));
                     diseaseCubeSupply[(int)loc.getColour()]--;
-                    */
-                    
+                    */            
                     yield return StartCoroutine(addCube(loc, loc.getColour(), drawn.getId()));
                 }
-                infectionDiscardPile.Add(drawn);
+                
+                
             }
         }
     }
