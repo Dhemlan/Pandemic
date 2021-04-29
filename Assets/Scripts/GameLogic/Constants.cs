@@ -4,16 +4,28 @@ using UnityEngine;
 
 public class ConstantVals
 {
-    public static string[] cities = {"Johannesburg", "Khartoum", "Kinshasa", "Lagos", "Sao Paulo","Buenos Aires","Bogata","Lima","Santiago","Mexico City","Miami",
-        "Los Angeles","San Francisco","Chicago","Atlanta","Washington"};
+    public static string[] cities = {"Johannesburg","Khartoum","Kinshasa","Lagos","Sao Paulo","Buenos Aires","Bogata","Lima","Santiago","Mexico City","Miami",
+        "Los Angeles","San Francisco","Chicago","Atlanta","Washington","Montreal","New York","Madrid","London","Paris","Essen","Milan","St Petersburg","Algiers",
+        "Cairo","Istanbul","Baghdad","Moscow","Riyadh","Karachi","Tehran","Delhi","Mumbai","Chennai","Kolkata","Bangkok","Jakarta","Ho ChiMinh City","Hong Kong",
+        "Sydney","Manila","Taipei","Osaka","Tokyo","Shanghai","Beijing","Seoul"};
 
     public static int[][] locNeighbours = 
-        new int[][] {new int[]{KHARTOUM,KINSHASA},new int[]{},new int[]{JOHANNESBURG,KHARTOUM,LAGOS},
-                            new int[]{JOHANNESBURG,KINSHASA,SAO_PAULO},new int[]{},new int[]{SAO_PAULO,BOGATA},
+        new int[][] {new int[]{KHARTOUM,KINSHASA},new int[]{JOHANNESBURG,KINSHASA,LAGOS,CAIRO},new int[]{JOHANNESBURG,KHARTOUM,LAGOS},
+                            new int[]{JOHANNESBURG,KINSHASA,SAO_PAULO},new int[]{LAGOS,BUENOS_AIRES,BOGATA,MADRID},new int[]{SAO_PAULO,BOGATA},
                             new int[]{SAO_PAULO,BUENOS_AIRES,LIMA,MEXICO_CITY,MIAMI},new int[]{BOGATA,SANTIAGO,MEXICO_CITY},new int[]{LIMA},
-                            new int[]{BOGATA,LIMA,MIAMI,LOS_ANGELES,CHICAGO},new int[]{BOGATA,MEXICO_CITY,ATLANTA,WASHINGTON},new int[]{},
-                            new int[]{},new int[]{},new int[]{MIAMI,CHICAGO,WASHINGTON},
-                            new int[]{}
+                            new int[]{BOGATA,LIMA,MIAMI,LOS_ANGELES,CHICAGO},new int[]{BOGATA,MEXICO_CITY,ATLANTA,WASHINGTON},new int[]{MEXICO_CITY,SAN_FRANCISCO,CHICAGO,SYDNEY},
+                            new int[]{LOS_ANGELES,CHICAGO,MANILA,TOKYO},new int[]{MEXICO_CITY,LOS_ANGELES,SAN_FRANCISCO,ATLANTA,MONTREAL},new int[]{MIAMI,CHICAGO,WASHINGTON},
+                            new int[]{MIAMI,ATLANTA,MONTREAL,NEW_YORK},new int[]{CHICAGO,WASHINGTON,NEW_YORK},new int[]{WASHINGTON,MONTREAL,LONDON,PARIS},
+                            new int[]{SAO_PAULO,NEW_YORK,LONDON,PARIS,ALGIERS},new int[]{NEW_YORK,MADRID,PARIS,ESSEN},new int[]{MADRID,LONDON,ESSEN,MILAN,ALGIERS},
+                            new int[]{LONDON,PARIS,MILAN,ST_PETERSBURG},new int[]{PARIS,ESSEN,ISTANBUL},new int[]{ESSEN,ISTANBUL,MOSCOW},
+                            new int[]{MADRID,PARIS,CAIRO,ISTANBUL},new int[]{KHARTOUM,ALGIERS,ISTANBUL,BAGHDAD,RIYADH},new int[]{MILAN,ST_PETERSBURG,ALGIERS,CAIRO,BAGHDAD,MOSCOW},
+                            new int[]{CAIRO,ISTANBUL,RIYADH,KARACHI,TEHRAN},new int[]{ST_PETERSBURG,ISTANBUL,TEHRAN},new int[]{CAIRO,BAGHDAD,KARACHI},
+                            new int[]{BAGHDAD,RIYADH,TEHRAN,DELHI,MUMBAI},new int[]{BAGHDAD,MOSCOW,KARACHI,DELHI},new int[]{KARACHI,TEHRAN,MUMBAI,CHENNAI,KOLKATA},
+                            new int[]{KARACHI,DELHI,CHENNAI},new int[]{DELHI,MUMBAI,KOLKATA,BANGKOK,JAKARTA},new int[]{DELHI,CHENNAI,BANGKOK,HONG_KONG},
+                            new int[]{CHENNAI,KOLKATA,JAKARTA,HO_CHI_MINH_CITY, HONG_KONG},new int[]{CHENNAI,BANGKOK,HO_CHI_MINH_CITY,SYDNEY},new int[]{BANGKOK,JAKARTA,HONG_KONG,MANILA},
+                            new int[]{KOLKATA,BANGKOK,HO_CHI_MINH_CITY,MANILA,TAIPEI,SHANGHAI},new int[]{LOS_ANGELES,JAKARTA,MANILA},new int[]{SAN_FRANCISCO,HO_CHI_MINH_CITY,HONG_KONG,SYDNEY,TAIPEI},
+                            new int[]{HONG_KONG,MANILA,OSAKA,SHANGHAI},new int[]{TAIPEI,TOKYO},new int[]{SAN_FRANCISCO,OSAKA,SHANGHAI,SEOUL},
+                            new int[]{HONG_KONG,TAIPEI,TOKYO,BEIJING,SEOUL},new int[]{SHANGHAI,SEOUL},new int[]{TOKYO,SHANGHAI,BEIJING}
                         };
 
     public const int BASE_INFECTION_RATE = 2;

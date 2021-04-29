@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 350 225" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <rect style="fill: rgb(255, 255, 255); stroke-width: 25px; stroke: rgb(255, 255, 0);" x="0" y="0" width="350" height="225" rx="10" ry="10" bx:origin="-0.345714 -0.579351"/>
+  <rect x="350" y="250" width="0.776" height="0.776" style="fill: rgb(216, 216, 216);"/>
+  <title id="title12433">Biohazard</title>
+  <g/>
+  <g transform="matrix(1, 0, 0, 1, 48.666668, -0.000001)"/>
+  <g transform="matrix(1, 0, 0, 1, 97.333336, 0)"/>
+  <g transform="matrix(1, 0, 0, 1, 194.666672, 0)"/>
+  <g transform="matrix(1, 0, 0, 1, 146, 0)"/>
+  <g transform="matrix(1, 0, 0, 1, 292, 0)"/>
+  <g transform="matrix(1, 0, 0, 1, 243.333328, 0)"/>
+</svg>
