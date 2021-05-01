@@ -9,20 +9,23 @@ public class GameFlowManager : MonoBehaviour
     private bool gameOverFlag = false;
 
     public Board board;
+    public PlayerManager playerManager;
+
+    private int characterCount = 2;
 
     void Start()
-    {
-        
+    {       
         StartCoroutine(gameFlow());
     }
 
-
     private IEnumerator gameFlow(){
-        yield return StartCoroutine(board.infectCities());
-        for (int i = 0; i < 10; i++){
-        board.movePhase();
-        yield return StartCoroutine(board.drawPhase());
-        yield return StartCoroutine(board.infectionPhase());
+        playerManager.generateCharacters(3);
+        board.boardSetUp();
+        //yield return StartCoroutine(board.infectCities());
+        while (true){
+            playerManager.movePhase();
+            yield return StartCoroutine(board.drawPhase());
+            yield return StartCoroutine(board.infectionPhase());
         }
         yield break;
     }

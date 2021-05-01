@@ -7,8 +7,7 @@ public class BoardUI : MonoBehaviour
 {
     public GameObject map;
     public GameObject infectionCard;
-    public GameObject playerCard1;
-    public GameObject playerCard2;
+    public GameObject playerCard1, playerCard2;
     public GameObject exampleLocation;
     public GameObject[] cubePrefabs;
 
@@ -23,6 +22,7 @@ public class BoardUI : MonoBehaviour
     public GameObject playerDeck;
     public GameObject infectionDeck;
     public GameObject infectionDiscard;
+    public GameObject hand1;
 
     public GameObject infectionRateMarker;
     public GameObject curInfectionRateCircle;
@@ -37,6 +37,7 @@ public class BoardUI : MonoBehaviour
     private Vector3 mapCentreRight;
     private Vector3 infectionDiscardCentre;
     private Vector3 playerDiscardCentre;
+    private Vector3 playerHand1Centre;
     
 
     public void Start(){
@@ -45,6 +46,7 @@ public class BoardUI : MonoBehaviour
         mapCentreRight = new Vector3(6, map.transform.position.y, 0);
         infectionDiscardCentre = new Vector3(infectionDiscard.transform.position.x, infectionDiscard.transform.position.y, 0);
         playerDiscardCentre = new Vector3(playerDiscard.transform.position.x, playerDiscard.transform.position.y,0);
+        playerHand1Centre = new Vector3(hand1.transform.position.x, hand1.transform.position.y, 0);
     }    
     
     public IEnumerator playerDraw(string name1, string name2){
@@ -57,8 +59,18 @@ public class BoardUI : MonoBehaviour
         yield return StartCoroutine(moveCardToCentre(playerCard2.transform, mapCentreRight, playerCardFace, new Vector3(1.5f,1.5f,1.5f)));
         playerCard2Title.text = name2;
         yield return new WaitForSeconds(ConstantVals.GENERIC_WAIT_TIME);
-        yield return StartCoroutine(moveToDiscard(playerCard1.transform, playerDiscardCentre));
-        yield return StartCoroutine(moveToDiscard(playerCard2.transform, playerDiscardCentre));
+        if (name1.Equals("Epidemic")){
+            yield return StartCoroutine(moveToDiscard(playerCard1.transform, playerDiscardCentre));
+        }
+        else {
+            yield return StartCoroutine(moveToDiscard(playerCard1.transform, playerHand1Centre));
+        }
+        if (name2.Equals("Epidemic")){
+            yield return StartCoroutine(moveToDiscard(playerCard2.transform, playerDiscardCentre));
+        }
+        else {
+            yield return StartCoroutine(moveToDiscard(playerCard2.transform, playerHand1Centre));
+        }
     
         resetPosition(playerCard1, playerDeck.transform, playerCardBack, playerCard1Title);
         resetPosition(playerCard2, playerDeck.transform, playerCardBack, playerCard2Title);
