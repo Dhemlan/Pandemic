@@ -9,7 +9,7 @@ public class PlayerUI : MonoBehaviour
     private List<Text[]> playerHands = new List<Text[]>();
     private List<SpriteRenderer[]> playerHandIcons = new List<SpriteRenderer[]>();
 
-    public Sprite yellowDiseaseIcon;
+    public Sprite[] diseaseIconSprites;
 
     public void setPlayers(List<GameObject> players){
         this.players = players;
@@ -28,7 +28,7 @@ public class PlayerUI : MonoBehaviour
         int i = 0;
         foreach (PlayerCard card in hand){
             playerHands[player.turnOrderPos - 1][i].text = card.getName();
-            playerHandIcons[player.turnOrderPos - 1][i].sprite = yellowDiseaseIcon;
+            playerHandIcons[player.turnOrderPos - 1][i].sprite = diseaseIconSprites[(int)card.getColour()];
             i++;
         }
     }

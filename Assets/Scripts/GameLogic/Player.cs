@@ -10,24 +10,13 @@ public class Player : MonoBehaviour
     public List<PlayerCard> hand = new List<PlayerCard>();
     public GameObject pawn;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void addCardToHand(PlayerCard card){
         hand.Add(card);
     }
 
-    public void hi(){
-        Debug.Log("hi");
+    public int getTurnOrderPos(){
+        return turnOrderPos;
     }
 
     public List<PlayerCard> getHand(){

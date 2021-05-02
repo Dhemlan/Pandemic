@@ -6,6 +6,8 @@ public class Card
 {
     protected int id;
     protected string name;
+    protected Location loc;
+    protected ConstantVals.Colour colour;
 
     public string getName(){
         return name;
@@ -13,5 +15,13 @@ public class Card
 
     public int getId(){
         return id;
+    }
+
+    public Location getLocation(){
+        return loc;
+    }
+
+    public ConstantVals.Colour getColour(){
+        return colour;
     }
 }

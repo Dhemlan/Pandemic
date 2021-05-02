@@ -36,13 +36,13 @@ public class ConstantVals
     public const int OUTBREAK_COUNT_LIMIT = 8;
     public const int INITIAL_DISEASE_CUBE_COUNT = 20;
 
-    public const float GENERIC_WAIT_TIME = 1.0f;
+    public const float GENERIC_WAIT_TIME = 0.75f;
 
     public const string GAME_OVER_OUTBREAKS = "Frequent outbreaks have made the disease uncontainable\nGame Over";
     public const string GAME_OVER_CUBES = "One of the diseases has taken over\nGame Over";
     public const string GAME_OVER_CARDS = "You've ran out of time\n Game Over";
 
-    public enum Colour {YELLOW, BLUE, BLACK, RED};
+    public enum Colour {YELLOW, BLUE, BLACK, RED, EPIDEMIC, EVENT};
     
     public const int JOHANNESBURG = 0;
     public const int KHARTOUM = 1;

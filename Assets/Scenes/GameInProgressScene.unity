@@ -1259,7 +1259,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &123946968
 GameObject:
@@ -1623,7 +1623,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &153106031
 GameObject:
@@ -3448,6 +3448,12 @@ MonoBehaviour:
   src: {fileID: 664809405}
   dest: {fileID: 1328550266}
   colour: {fileID: 2100000, guid: 0ce55cded5dc6b14b8a76c31e669e8a2, type: 2}
+--- !u!1 &236110804 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5611439884497199058, guid: 696802ad511439343bd3380c24939cad,
+    type: 3}
+  m_PrefabInstance: {fileID: 1628499767}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &237116646
 GameObject:
   m_ObjectHideFlags: 0
@@ -5605,10 +5611,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faeb479366e00a8449b056e9ed66f08c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  map: {fileID: 2069384909}
-  infectionCard: {fileID: 1499372685}
-  playerCard1: {fileID: 1671372719}
-  playerCard2: {fileID: 456233669}
+  cardUI: {fileID: 1253473105}
   exampleLocation: {fileID: 1897527282}
   cubePrefabs:
   - {fileID: 8783805712824926424, guid: 121708274d61b7f4690e120b0f454820, type: 3}
@@ -5622,27 +5625,8 @@ MonoBehaviour:
   - {fileID: 335911333}
   outbreaksCounterText: {fileID: 2081343369}
   playerDeckCountText: {fileID: 475890614}
-  infectionCardTitle: {fileID: 2017042741}
-  playerCard1Title: {fileID: 756226870}
-  playerCard2Title: {fileID: 339653265}
-  playerDiscard: {fileID: 1299817312}
-  playerDeck: {fileID: 1295810090}
-  infectionDeck: {fileID: 1298198583}
-  infectionDiscard: {fileID: 1055140969}
-  hand1: {fileID: 497427204}
   infectionRateMarker: {fileID: 126640252}
   curInfectionRateCircle: {fileID: 28326439}
-  playerCardFace: {fileID: 3286163911610860551, guid: e73e6c11292fa2348b1e6e21da052414,
-    type: 3}
-  playerCardBack: {fileID: 3286163911610860551, guid: 56268543878434c41961a82f461f2d1d,
-    type: 3}
-  infectionCardFaces:
-  - {fileID: 3286163911610860551, guid: 86df075d161a34843af0abcbccae52a6, type: 3}
-  - {fileID: 3286163911610860551, guid: cb4478d1c68fb0045acb51d1ac863547, type: 3}
-  - {fileID: 3286163911610860551, guid: 1c3947e94ae7f1a49b2b60b05f5f3724, type: 3}
-  - {fileID: 3286163911610860551, guid: af869ba60ce74dc4eabf2419038d23ac, type: 3}
-  infectionCardBack: {fileID: 3286163911610860551, guid: c064931f036cc774cb960e6161fc51ab,
-    type: 3}
 --- !u!1 &471148271
 GameObject:
   m_ObjectHideFlags: 0
@@ -7796,6 +7780,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   locUi: {fileID: 0}
   colour: 1
+--- !u!1 &639976808 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5611439884497199058, guid: 696802ad511439343bd3380c24939cad,
+    type: 3}
+  m_PrefabInstance: {fileID: 183074947}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &657394408
 GameObject:
   m_ObjectHideFlags: 0
@@ -13330,7 +13320,7 @@ Transform:
   m_Children:
   - {fileID: 1996858440}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1149330684
 GameObject:
@@ -14303,6 +14293,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardUI: {fileID: 467769783}
+  cardUI: {fileID: 1253473105}
   gameFlowManager: {fileID: 185358520}
   playerManager: {fileID: 109051348}
 --- !u!4 &1220601656
@@ -14892,6 +14883,81 @@ MonoBehaviour:
   src: {fileID: 169457321}
   dest: {fileID: 1207456223}
   colour: {fileID: 2100000, guid: 0ce55cded5dc6b14b8a76c31e669e8a2, type: 2}
+--- !u!1 &1253473104
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1253473106}
+  - component: {fileID: 1253473105}
+  m_Layer: 0
+  m_Name: CardUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1253473105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1253473104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d62e78183a0c7e048ba17b239fadb94c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  map: {fileID: 2069384909}
+  playerCard1: {fileID: 1671372719}
+  playerCard2: {fileID: 456233669}
+  infectionCard: {fileID: 1499372685}
+  playerDiscard: {fileID: 1299817312}
+  infectionDiscard: {fileID: 1055140969}
+  playerDeck: {fileID: 1295810090}
+  infectionDeck: {fileID: 1298198583}
+  playerCard1Title: {fileID: 756226870}
+  playerCard2Title: {fileID: 339653265}
+  infectionCardTitle: {fileID: 2017042741}
+  playerCardFace: {fileID: 3286163911610860551, guid: 56268543878434c41961a82f461f2d1d,
+    type: 3}
+  playerCardBack: {fileID: 3286163911610860551, guid: 56268543878434c41961a82f461f2d1d,
+    type: 3}
+  infectionCardBack: {fileID: 3286163911610860551, guid: c064931f036cc774cb960e6161fc51ab,
+    type: 3}
+  infectionCardFaces:
+  - {fileID: 3286163911610860551, guid: 86df075d161a34843af0abcbccae52a6, type: 3}
+  - {fileID: 3286163911610860551, guid: cb4478d1c68fb0045acb51d1ac863547, type: 3}
+  - {fileID: 3286163911610860551, guid: 1c3947e94ae7f1a49b2b60b05f5f3724, type: 3}
+  - {fileID: 3286163911610860551, guid: af869ba60ce74dc4eabf2419038d23ac, type: 3}
+  playerCardFaces:
+  - {fileID: 3286163911610860551, guid: e3fedb838628b2c4a91703e2047d26a1, type: 3}
+  - {fileID: 3286163911610860551, guid: 8c2a26e2577810d4c970df480453caaa, type: 3}
+  - {fileID: 3286163911610860551, guid: 1c3947e94ae7f1a49b2b60b05f5f3724, type: 3}
+  - {fileID: 3286163911610860551, guid: 4177d1d8d018095438fde56d7b72fa05, type: 3}
+  - {fileID: 3286163911610860551, guid: 1d70beffe4587ef4dac7fe398b7648b9, type: 3}
+  hand1: {fileID: 639976808}
+  hand2: {fileID: 497427204}
+  hand3: {fileID: 236110804}
+  hand4: {fileID: 1700260439}
+--- !u!4 &1253473106
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1253473104}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.2484858, y: 2.9293282, z: -1406.1719}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1263535173
 GameObject:
   m_ObjectHideFlags: 0
@@ -20531,7 +20597,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 3286163911610860551, guid: 56268543878434c41961a82f461f2d1d,
+  m_Sprite: {fileID: 3286163911610860551, guid: 40fa34e9b8d56f04083aa8a8be7e929a,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -20540,7 +20606,7 @@ SpriteRenderer:
   m_Size: {x: 2.45, y: 3.7}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &1677155639
@@ -20910,6 +20976,12 @@ MonoBehaviour:
   src: {fileID: 1957195974}
   dest: {fileID: 172159557}
   colour: {fileID: 2100000, guid: 0ce55cded5dc6b14b8a76c31e669e8a2, type: 2}
+--- !u!1 &1700260439 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5611439884497199058, guid: 696802ad511439343bd3380c24939cad,
+    type: 3}
+  m_PrefabInstance: {fileID: 203841586}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1743788269
 GameObject:
   m_ObjectHideFlags: 0

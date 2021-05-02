@@ -62,4 +62,8 @@ public class PlayerManager : MonoBehaviour
             curPlayer = playerPool[curPlayer.turnOrderPos];
         }
     }
+
+    public Player getCurPlayer(){
+        return curPlayer;
+    }
 }
