@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LocationUI : MonoBehaviour
+public class BoardGenerator : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -14,9 +14,5 @@ public class LocationUI : MonoBehaviour
     void Update()
     {
         
-    }
-
-    public void addCube(ConstantVals.Colour cube){
-
     }
 }

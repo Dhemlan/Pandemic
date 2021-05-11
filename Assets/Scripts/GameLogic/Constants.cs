@@ -35,6 +35,11 @@ public class ConstantVals
     public const int CARDS_PER_INITIAL_INFECTION_ROUND = 3;
     public const int OUTBREAK_COUNT_LIMIT = 8;
     public const int INITIAL_DISEASE_CUBE_COUNT = 20;
+    public const int DISEASE_COUNT = 4;
+    public const int DEFAULT_CARDS_TO_CURE = 2;
+
+    public const int DEFAULT_HAND_LIMIT = 4;
+    public const int MAX_HAND_SIZE = 8;
 
     public const float GENERIC_WAIT_TIME = 0.75f;
 
@@ -43,6 +48,8 @@ public class ConstantVals
     public const string GAME_OVER_CARDS = "You've ran out of time\n Game Over";
 
     public enum Colour {YELLOW, BLUE, BLACK, RED, EPIDEMIC, EVENT};
+
+    public enum Phase {ACTION, DRAW, INFECTION};
     
     public const int JOHANNESBURG = 0;
     public const int KHARTOUM = 1;

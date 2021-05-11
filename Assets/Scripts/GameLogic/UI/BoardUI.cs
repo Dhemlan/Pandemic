@@ -11,11 +11,11 @@ public class BoardUI : MonoBehaviour
     public GameObject[] cubePrefabs;
 
     public Text[] cubeReserveText;
-    public Text outbreaksCounterText;
-    public Text playerDeckCountText;
+    public Text outbreaksCounterText, playerDeckCountText;
 
-    public GameObject infectionRateMarker;
-    public GameObject curInfectionRateCircle;
+    public GameObject infectionRateMarker, curInfectionRateCircle;
+
+    public Button drawButton;
 
     public void setPlayerDeckCount(int newCount){
         playerDeckCountText.text = newCount + "";
@@ -43,12 +43,20 @@ public class BoardUI : MonoBehaviour
         yield return new WaitForSeconds(1);
     }
 
+    public void removeCube(Location loc, ConstantVals.Colour colour){
+        Destroy(loc.transform.GetChild(0).gameObject);
+    }
+
     public void increaseOutbreakCounter(int newCount){
         outbreaksCounterText.text = newCount + "/8";
     }
 
     public void setCubeCount(ConstantVals.Colour colour, int count){
         cubeReserveText[(int)colour].text = count + "";
+    }
+
+    public void activateDrawButton(){
+        drawButton.gameObject.SetActive(true);
     }
 
 }

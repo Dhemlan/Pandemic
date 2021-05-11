@@ -28,6 +28,8 @@ public class Board : MonoBehaviour
     private int epidemicCardCount = 6;
     private int outbreakCount = 0;
     private int[] diseaseCubeSupply = new int[] {ConstantVals.INITIAL_DISEASE_CUBE_COUNT,ConstantVals.INITIAL_DISEASE_CUBE_COUNT,ConstantVals.INITIAL_DISEASE_CUBE_COUNT,ConstantVals.INITIAL_DISEASE_CUBE_COUNT};
+    private int[] cardsToCure = new int[] {ConstantVals.DEFAULT_CARDS_TO_CURE, ConstantVals.DEFAULT_CARDS_TO_CURE, ConstantVals.DEFAULT_CARDS_TO_CURE, ConstantVals.DEFAULT_CARDS_TO_CURE};
+    private int[] diseaseStatus = new int[] {0,0,0,0};
 
 
     public IEnumerator drawPhase(){
@@ -66,6 +68,7 @@ public class Board : MonoBehaviour
                     playerManager.drawPhaseAdd(drawn);
                 }
             }
+            yield return StartCoroutine(playerManager.checkHandLimit(playerManager.getCurPlayer()));
     }
 
     public IEnumerator infectionPhase(){
@@ -100,6 +103,18 @@ public class Board : MonoBehaviour
         }
         yield break;
     }
+
+    public void removeCube(Location loc){
+        ConstantVals.Colour colour = loc.getColour();
+        if (loc.removeCube()){
+            diseaseCubeSupply[(int)colour]++;
+            Debug.Log("Removing cube in " + loc.getName());
+            boardUI.setCubeCount(colour, diseaseCubeSupply[(int)colour]);
+            boardUI.removeCube(loc, colour);
+            playerManager.incrementCompletedActions();
+        }
+        else Debug.Log("no cubes to remove");
+    }
     
     public IEnumerator outbreakOccurs(Location loc, ConstantVals.Colour cubeColour, int locId){
         if (!outbreakCitiesThisMove.Contains(locId)){
@@ -121,9 +136,33 @@ public class Board : MonoBehaviour
         yield break;
     }
 
+    public int[] retrieveCureRequirements(){
+        return cardsToCure;
+    }
+
+    public IEnumerator cure(int numberOfCardsRequired, Player player){
+        List<PlayerCard> discarded = new List<PlayerCard>();
+        yield return StartCoroutine(cardUI.allowSelectionToDiscard(player.getHand(), discarded, numberOfCardsRequired));
+        diseaseStatus[(int)discarded[0].getColour()] = 1;
+    }
+
+    public void discardCard(PlayerCard card){
+        playerDiscardPile.Add(card);
+    }
+
+    public IEnumerator displayPlayerDiscard(){
+        List<GameObject> displayedCards = new List<GameObject>();
+        cardUI.displayInteractableCards(playerDiscardPile, displayedCards);
+        yield return new WaitForSeconds(2.0f);
+        cardUI.clearCards(displayedCards);
+
+    }
+
     public void boardSetUp(){
         setUpLocations();
         generateDecks();
+        locations[ConstantVals.ATLANTA].buildResearchStation();
+        locations[ConstantVals.BANGKOK].buildResearchStation();
         
     }
 
@@ -194,6 +233,10 @@ public class Board : MonoBehaviour
                 }             
             }
         }
+    }
+
+    public void promptDrawPhase(){
+        boardUI.activateDrawButton();
     }
 
 }

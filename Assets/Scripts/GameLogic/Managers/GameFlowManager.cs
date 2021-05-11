@@ -12,6 +12,7 @@ public class GameFlowManager : MonoBehaviour
     public PlayerManager playerManager;
 
     private int characterCount = 2;
+    private ConstantVals.Phase phase;
 
     void Start()
     {       
@@ -19,15 +20,23 @@ public class GameFlowManager : MonoBehaviour
     }
 
     private IEnumerator gameFlow(){
-        playerManager.generateCharacters(3);
+        playerManager.generateCharacters(2);
         board.boardSetUp();
         //yield return StartCoroutine(board.infectCities());
         while (true){
-            playerManager.movePhase();
+            phase = ConstantVals.Phase.ACTION;
+            yield return StartCoroutine(playerManager.movePhase());
+            //playerManager.movePhase();
+            phase = ConstantVals.Phase.DRAW;
             yield return StartCoroutine(board.drawPhase());
+            phase = ConstantVals.Phase.INFECTION;
             yield return StartCoroutine(board.infectionPhase());
         }
         yield break;
+    }
+
+    public ConstantVals.Phase getPhase(){
+        return phase;
     }
 
     public void gameOver(string message){

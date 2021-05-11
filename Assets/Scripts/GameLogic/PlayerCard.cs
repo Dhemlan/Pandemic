@@ -1,8 +1,9 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCard : Card
+public class PlayerCard : Card, IComparable<PlayerCard>
 {
 
     public PlayerCard(Location loc, int id, string name){
@@ -19,4 +20,12 @@ public class PlayerCard : Card
             }
         }
     }
+
+    public int CompareTo(PlayerCard o){
+        if(colour < o.getColour()){
+            return -1;
+        }
+        else return 1;
+    }
+
 }
