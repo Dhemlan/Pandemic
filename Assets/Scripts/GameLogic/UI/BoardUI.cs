@@ -14,6 +14,9 @@ public class BoardUI : MonoBehaviour
     public Text outbreaksCounterText, playerDeckCountText;
 
     public GameObject infectionRateMarker, curInfectionRateCircle;
+    public GameObject[] cureTokens;
+    public Sprite[] curedSprites;
+    public Sprite[] eradicatedSprites;
 
     public Button drawButton;
 
@@ -27,10 +30,10 @@ public class BoardUI : MonoBehaviour
         infectionRateMarker.transform.localPosition = Vector3.zero;
     }
 
-    public IEnumerator addCube(Location loc, ConstantVals.Colour colour){
+    public IEnumerator addCube(Location loc, Vals.Colour colour){
         GameObject diseaseCube = Instantiate(cubePrefabs[(int)colour], new Vector3(10,10,0), Quaternion.identity);
         diseaseCube.transform.SetParent(loc.transform);
-        float width = exampleLocation.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        float width = exampleLocation.GetComponent<SpriteRenderer>().sprite.bounds.size.x *.35f;
         
         Transform[] cubes = loc.transform.GetComponentsInChildren<Transform>();
         float space = 2 * width / cubes.Length;
@@ -43,7 +46,7 @@ public class BoardUI : MonoBehaviour
         yield return new WaitForSeconds(1);
     }
 
-    public void removeCube(Location loc, ConstantVals.Colour colour){
+    public void removeCube(Location loc, Vals.Colour colour){
         Destroy(loc.transform.GetChild(0).gameObject);
     }
 
@@ -51,12 +54,24 @@ public class BoardUI : MonoBehaviour
         outbreaksCounterText.text = newCount + "/8";
     }
 
-    public void setCubeCount(ConstantVals.Colour colour, int count){
+    public void setCubeCount(Vals.Colour colour, int count){
         cubeReserveText[(int)colour].text = count + "";
     }
 
     public void activateDrawButton(){
         drawButton.gameObject.SetActive(true);
+    }
+
+    public void buildResearchStation(){
+        
+    }
+
+    public void diseaseCured(Vals.Colour colour){
+        cureTokens[(int)colour].GetComponent<SpriteRenderer>().sprite = curedSprites[(int)colour];
+    }
+
+    public void diseaseEradicated(Vals.Colour colour){
+        cureTokens[(int)colour].GetComponent<SpriteRenderer>().sprite = eradicatedSprites[(int)colour];
     }
 
 }

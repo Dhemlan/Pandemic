@@ -9,12 +9,15 @@ public class InteractableCard : MonoBehaviour
     private SpriteRenderer spriteRen;
     public GameObject selectedIcon;
     public Text label;
+    public ActionManager actionManager;
 
-    void Start(){
+    void Awake(){
+        actionManager = GameObject.Find("ActionManager").GetComponent<ActionManager>();
     }
 
     void OnMouseDown(){
         selectedIcon.SetActive(!selectedIcon.activeSelf);
+        actionManager.handlePresentedPlayerCardClick(selectedIcon.activeSelf, card);
     }
     
     public void populateCardInfo(PlayerCard card, string name){

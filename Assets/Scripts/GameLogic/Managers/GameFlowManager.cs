@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameFlowManager : MonoBehaviour
 {
@@ -12,11 +13,12 @@ public class GameFlowManager : MonoBehaviour
     public PlayerManager playerManager;
 
     private int characterCount = 2;
-    private ConstantVals.Phase phase;
+    private Vals.Phase phase;
 
     void Start()
     {       
         StartCoroutine(gameFlow());
+        DontDestroyOnLoad(gameObject);
     }
 
     private IEnumerator gameFlow(){
@@ -24,24 +26,25 @@ public class GameFlowManager : MonoBehaviour
         board.boardSetUp();
         //yield return StartCoroutine(board.infectCities());
         while (true){
-            phase = ConstantVals.Phase.ACTION;
+            phase = Vals.Phase.ACTION;
             yield return StartCoroutine(playerManager.movePhase());
             //playerManager.movePhase();
-            phase = ConstantVals.Phase.DRAW;
+            phase = Vals.Phase.DRAW;
             yield return StartCoroutine(board.drawPhase());
-            phase = ConstantVals.Phase.INFECTION;
+            phase = Vals.Phase.INFECTION;
             yield return StartCoroutine(board.infectionPhase());
         }
         yield break;
     }
 
-    public ConstantVals.Phase getPhase(){
+    public Vals.Phase getPhase(){
         return phase;
     }
 
     public void gameOver(string message){
         Debug.Log(message);
-       // SceneManager.LoadScene("GameOver");
-        gameOverFlag = true;
+        SceneManager.LoadScene("GameOver");
+        
+
     }
 }

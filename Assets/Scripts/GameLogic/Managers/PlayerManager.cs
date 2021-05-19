@@ -46,7 +46,10 @@ public class PlayerManager : MonoBehaviour
 
     public void generateCharacters(int count){
         for (int i = 0; i < count; i++){
-            activePlayerScripts.Add(allPlayerObjects[i].GetComponent<Player>());
+            Player newPlayer = allPlayerObjects[i].GetComponent<Player>();
+            activePlayerScripts.Add(newPlayer);
+            //newPlayer.getLocation().playerEnters(newPlayer);
+
             activePlayerObjects.Add(allPlayerObjects[i]);
         }
         curPlayer = activePlayerScripts[0];
@@ -70,7 +73,7 @@ public class PlayerManager : MonoBehaviour
         int numberCardsToDiscard = player.overHandLimit();
         if (numberCardsToDiscard > 0){
             List<PlayerCard> toDiscard = new List<PlayerCard>();
-            yield return StartCoroutine(cardUI.allowSelectionToDiscard(player.getHand(), toDiscard, numberCardsToDiscard));
+            yield return StartCoroutine(cardUI.allowSelectionToDiscard(player.getHand(), toDiscard, numberCardsToDiscard, null));
             player.discardCards(toDiscard);
             foreach (PlayerCard card in toDiscard){
                 board.discardCard(card);
@@ -124,6 +127,22 @@ public class PlayerManager : MonoBehaviour
     }
 
     public void endActionPhase(){
+        completedActions = maxActions;
         proceedSwitch = true;
     }
+
+    public List<Player> getLocalPlayers(Location loc){
+        List<Player> localPlayers = new List<Player>();
+        foreach (Player player in activePlayerScripts){
+            if (player.getLocation().Equals(loc)){
+                localPlayers.Add(player);
+            }
+        }
+        return localPlayers;
+    }
+
+    public void updateHand(Player player){
+        playerUI.updateHand(player, player.getHand());
+    }
+
 }

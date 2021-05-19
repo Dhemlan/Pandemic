@@ -7,7 +7,7 @@ public class Card
     protected int id;
     protected string name;
     protected Location loc;
-    protected ConstantVals.Colour colour;
+    protected Vals.Colour colour;
 
     public string getName(){
         return name;
@@ -21,7 +21,7 @@ public class Card
         return loc;
     }
 
-    public ConstantVals.Colour getColour(){
+    public Vals.Colour getColour(){
         return colour;
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class CardUI : MonoBehaviour
 {   
@@ -25,7 +26,11 @@ public class CardUI : MonoBehaviour
     private Vector3 mapCentre, mapCentreLeft, mapCentreRight;
     private Vector3 playerDiscardCentre, infectionDiscardCentre;
     private Vector3[] handCentres = new Vector3[4];
+
     private bool proceedSwitch = false;
+    private int remainderToSelect;
+    private Nullable<Vals.Colour> cardTypeToSelect;
+    private List<GameObject> displayedCards = new List<GameObject>();
 
     public void Start(){
         mapCentre = new Vector3(map.transform.position.x, map.transform.position.y,0);
@@ -48,7 +53,7 @@ public class CardUI : MonoBehaviour
         playerCard1Title.text = card1.getName();
         yield return StartCoroutine(moveAndFlipCard(playerCard2.transform, mapCentreRight, playerCardFaces[(int)card2.getColour()], new Vector3(1.5f,1.5f,1.5f)));
         playerCard2Title.text = card2.getName();
-        yield return new WaitForSeconds(ConstantVals.GENERIC_WAIT_TIME);
+        yield return new WaitForSeconds(Vals.GENERIC_WAIT_TIME);
         if (card1.getName().Equals("Epidemic")){
             yield return StartCoroutine(moveAndShrinkCard(playerCard1.transform, playerDiscardCentre));
         }
@@ -67,13 +72,13 @@ public class CardUI : MonoBehaviour
         yield break;
     } 
 
-    public IEnumerator infectionDraw(string name, ConstantVals.Colour colour){
+    public IEnumerator infectionDraw(string name, Vals.Colour colour){
         infectionCard.SetActive(true);
         yield return new WaitForSeconds(0.3f);
         
         yield return StartCoroutine(moveAndFlipCard(infectionCard.transform, mapCentre, infectionCardFaces[(int)colour], new Vector3(1,1,1)));
         infectionCardTitle.text = name;
-        yield return new WaitForSeconds(ConstantVals.GENERIC_WAIT_TIME);
+        yield return new WaitForSeconds(Vals.GENERIC_WAIT_TIME);
         yield return StartCoroutine(moveAndShrinkCard(infectionCard.transform, infectionDiscardCentre));
         resetPosition(infectionCard, infectionDeck.transform, infectionCardBack, infectionCardTitle);
         yield break;
@@ -84,11 +89,11 @@ public class CardUI : MonoBehaviour
         var t = 0f;
         while(t < 1)
         {
-                t += Time.deltaTime / ConstantVals.GENERIC_WAIT_TIME;
+                t += Time.deltaTime / Vals.GENERIC_WAIT_TIME;
                 transform.position = Vector3.Lerp(currentPos, newPosition, t);      
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(new Vector3(0,180,0)), t);
                 transform.localScale =  Vector3.Lerp(transform.localScale, scale, t);
-                SpriteRenderer spriteRen= transform.GetComponent<SpriteRenderer>();
+                SpriteRenderer spriteRen = transform.GetComponent<SpriteRenderer>();
                 spriteRen.sortingLayerName = "Default";
                 spriteRen.sprite = cardFace;  
                 yield return null;
@@ -101,7 +106,7 @@ public class CardUI : MonoBehaviour
         var t = 0f;
         while(t < 1)
         {
-                t += Time.deltaTime / ConstantVals.GENERIC_WAIT_TIME;
+                t += Time.deltaTime / Vals.GENERIC_WAIT_TIME;
                 transform.position = Vector3.Lerp(currentPos, newPosition, t);
                 transform.localScale =  Vector3.Lerp(currentScale, new Vector3(0,0,0), t);
                 yield return null;
@@ -119,25 +124,73 @@ public class CardUI : MonoBehaviour
         title.text= "";
     }
 
-    public IEnumerator allowSelectionToDiscard(List<PlayerCard> cards, List<PlayerCard> selectedCards, int numberToDiscard){
-        List<GameObject> displayedCards = new List<GameObject>();
-        displayInteractableCards(cards, displayedCards);
-        cardDisplayInstructionsText.text = "Select " + numberToDiscard + " cards to discard";
-        while (selectedCards.Count != numberToDiscard){
-            selectedCards.Clear();
-            yield return new WaitForSeconds(.2f);
-            foreach (GameObject displayedCard in displayedCards){
-                InteractableCard script = displayedCard.GetComponent<InteractableCard>();
-                if (script.isSelected()){
-                    selectedCards.Add(script.getCard());
+    public IEnumerator allowSelectionToDiscard(List<PlayerCard> cards, List<PlayerCard> selectedCards, int numberToDiscard, Nullable<Vals.Colour> colourToDiscard){
+        remainderToSelect = numberToDiscard;
+        cardTypeToSelect = colourToDiscard;
+        displayedCards = new List<GameObject>();
+        string message = "Select " + numberToDiscard + " cards to discard";
+        displayInteractableCards(cards, displayedCards, message);
+        proceedSwitch = false;
+        Debug.Log(cardTypeToSelect);
+        while (!proceedSwitch){
+            yield return new WaitUntil(() => remainderToSelect == 0);
+            playerConfirmationButton.gameObject.SetActive(true);
+            yield return new WaitUntil(() => proceedSwitch);
+            
+            if (remainderToSelect != 0){
+                Debug.Log(remainderToSelect);
+                proceedSwitch = false;
+                continue;
+            }
+            else {
+                selectedCards.Clear();
+                getSelectedCards(displayedCards, selectedCards);
+                if (selectedCards.Count != numberToDiscard){
+                    proceedSwitch = false;
+                    playerConfirmationButton.gameObject.SetActive(false);
+                    continue;
                 }
             }
         }
-        playerConfirmationButton.gameObject.SetActive(true);
-        yield return new WaitUntil(() => proceedSwitch);
+        playerConfirmationButton.gameObject.SetActive(false);
+        clearCards(displayedCards);
+    }
+        
+
+    /*
+    public IEnumerator allowSelectionToDiscard(List<PlayerCard> cards, List<PlayerCard> selectedCards, int numberToDiscard){
+        List<GameObject> displayedCards = new List<GameObject>();
+        string message = "Select " + numberToDiscard + " cards to discard";
+        displayInteractableCards(cards, displayedCards, message);
+
+        while (!proceedSwitch){
+            while (selectedCards.Count != numberToDiscard){
+                selectedCards.Clear();
+                yield return new WaitForSeconds(.2f);
+                getSelectedCards(displayedCards, selectedCards);
+            }
+            playerConfirmationButton.gameObject.SetActive(true);
+            yield return new WaitUntil(() => proceedSwitch);
+            if (selectedCards.Count == numberToDiscard && cardMatchRequirements()){
+                break;
+            }
+            else {
+                proceedSwitch = false;
+            }
+        }
         playerConfirmationButton.gameObject.SetActive(false);
         clearCards(displayedCards);
         proceedSwitch = false;
+    }
+    */
+
+    public void getSelectedCards(List<GameObject> displayedCards, List<PlayerCard> selectedCards){
+        foreach (GameObject displayedCard in displayedCards){
+            InteractableCard script = displayedCard.GetComponent<InteractableCard>();
+            if (script.isSelected()){
+                selectedCards.Add(script.getCard());
+            }
+        }
     }
 
     public void clearCards(List<GameObject> cards){
@@ -147,10 +200,11 @@ public class CardUI : MonoBehaviour
         cardDisplayArea.SetActive(false);
     }
 
-    public void displayInteractableCards(List<PlayerCard> cards, List<GameObject> displayedCards){
+    public void displayInteractableCards(List<PlayerCard> cards, List<GameObject> displayedCards, string message){
         
         int i = -25;
         cardDisplayArea.SetActive(true);
+        cardDisplayInstructionsText.text = message;
         foreach (PlayerCard card in cards){
             GameObject displayedCard = Instantiate(cardPrefab, new Vector3(i,0,0), Quaternion.identity, cardDisplayArea.transform);
             displayedCard.GetComponent<InteractableCard>().populateCardInfo(card, card.getName());
@@ -163,4 +217,15 @@ public class CardUI : MonoBehaviour
     public void proceed(){
         proceedSwitch = true;
     }
+
+    public void adjustDiscardRequiredCount(int amount, PlayerCard card){
+        if (cardTypeToSelect == null){
+            remainderToSelect -=amount;
+        }
+        else if (card.getColour() == cardTypeToSelect){
+            remainderToSelect -= amount;
+        }
+
+    }
+
 }

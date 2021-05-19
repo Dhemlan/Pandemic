@@ -12,11 +12,11 @@ public class PlayerCard : Card, IComparable<PlayerCard>
         this.name = name;
         if (loc != null) colour = loc.getColour();
         else{
-            if (id == ConstantVals.EPIDEMIC){
-                colour = ConstantVals.Colour.EPIDEMIC;
+            if (id == Vals.EPIDEMIC){
+                colour = Vals.Colour.EPIDEMIC;
             }
             else{
-                colour = ConstantVals.Colour.EVENT;
+                colour = Vals.Colour.EVENT;
             }
         }
     }

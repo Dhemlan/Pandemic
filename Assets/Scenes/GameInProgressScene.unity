@@ -1912,6 +1912,7 @@ MonoBehaviour:
   - {fileID: 132084206}
   - {fileID: 0}
   - {fileID: 0}
+  pawnSprites: []
 --- !u!4 &148158257
 Transform:
   m_ObjectHideFlags: 0
@@ -2524,7 +2525,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameFlowManager: {fileID: 185358520}
   playerManager: {fileID: 109051348}
+  playerUI: {fileID: 148158256}
   board: {fileID: 1220601655}
+  cardUI: {fileID: 1253473105}
 --- !u!4 &181323479
 Transform:
   m_ObjectHideFlags: 0
@@ -6302,6 +6305,21 @@ MonoBehaviour:
   playerDeckCountText: {fileID: 475890614}
   infectionRateMarker: {fileID: 126640252}
   curInfectionRateCircle: {fileID: 28326439}
+  cureTokens:
+  - {fileID: 621106207}
+  - {fileID: 817250905}
+  - {fileID: 1573935099}
+  - {fileID: 1681262567}
+  curedSprites:
+  - {fileID: 3286163911610860551, guid: 637777b908a02ec4b86a216f7ef79bcb, type: 3}
+  - {fileID: 3286163911610860551, guid: c765638b9544fe84a9fe0496cc4b3275, type: 3}
+  - {fileID: 3286163911610860551, guid: d9b408bd9f7ba264aa76a6831871d9ca, type: 3}
+  - {fileID: 3286163911610860551, guid: 731ad0dde0e194f4c9dd952678bdab0e, type: 3}
+  eradicatedSprites:
+  - {fileID: 3286163911610860551, guid: 00a1458ed3f417e4cba4d9905b05be6e, type: 3}
+  - {fileID: 3286163911610860551, guid: 83d4a9694d4a1d44aabd18e7b8ec68d8, type: 3}
+  - {fileID: 3286163911610860551, guid: c12245b0679c89d4595d352dc78ca548, type: 3}
+  - {fileID: 3286163911610860551, guid: 0d9b81bd9c1c80a44a2011cafd148858, type: 3}
   drawButton: {fileID: 648724437}
 --- !u!1 &471148271
 GameObject:
@@ -8623,7 +8641,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_Sprite: {fileID: 3286163911610860551, guid: 00a1458ed3f417e4cba4d9905b05be6e,
+  m_Sprite: {fileID: 3286163911610860551, guid: d755f396ee19c024f9a12a5429082d26,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -10936,8 +10954,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09d83af79b28327419b65831b6949140, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerManager: {fileID: 109051348}
   turnOrderPos: 4
   startingLoc: {fileID: 1424507122}
+  board: {fileID: 0}
 --- !u!114 &767512138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11943,11 +11963,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 817250905}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.09, y: 1.277, z: 0}
+  m_LocalPosition: {x: -2.66, y: 1.277, z: 0}
   m_LocalScale: {x: 0.5, y: 0.74999994, z: 1}
   m_Children: []
   m_Father: {fileID: 1962507117}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &817250907
 SpriteRenderer:
@@ -11987,7 +12007,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_Sprite: {fileID: 3286163911610860551, guid: 83d4a9694d4a1d44aabd18e7b8ec68d8,
+  m_Sprite: {fileID: 3286163911610860551, guid: a613fb9bb97d9be4287694e0e725c98c,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -12023,8 +12043,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09d83af79b28327419b65831b6949140, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerManager: {fileID: 109051348}
   turnOrderPos: 3
   startingLoc: {fileID: 1424507122}
+  board: {fileID: 1220601655}
 --- !u!114 &824870013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12556,6 +12578,36 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!1 &871334088
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 871334089}
+  m_Layer: 0
+  m_Name: Block clicking on locations through UI elements
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &871334089
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 871334088}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1142937351}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &903223448
 GameObject:
   m_ObjectHideFlags: 0
@@ -15283,6 +15335,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1996858440}
+  - {fileID: 871334089}
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -21906,11 +21959,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1573935099}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.53, y: 1.277, z: 0}
+  m_LocalPosition: {x: -2.09, y: 1.277, z: 0}
   m_LocalScale: {x: 0.5, y: 0.74999994, z: 1}
   m_Children: []
   m_Father: {fileID: 1962507117}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1573935101
 SpriteRenderer:
@@ -21950,7 +22003,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_Sprite: {fileID: 3286163911610860551, guid: d9b408bd9f7ba264aa76a6831871d9ca,
+  m_Sprite: {fileID: 3286163911610860551, guid: 25871c466ed707547b557f1780a1365c,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -22388,8 +22441,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09d83af79b28327419b65831b6949140, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerManager: {fileID: 109051348}
   turnOrderPos: 2
   startingLoc: {fileID: 1424507122}
+  board: {fileID: 1220601655}
 --- !u!114 &1587156249
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24052,11 +24107,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1681262567}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.66, y: 1.277, z: 0}
+  m_LocalPosition: {x: -1.53, y: 1.277, z: 0}
   m_LocalScale: {x: 0.5, y: 0.74999994, z: 1}
   m_Children: []
   m_Father: {fileID: 1962507117}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1681262569
 SpriteRenderer:
@@ -26954,9 +27009,9 @@ Transform:
   m_LocalScale: {x: 140, y: 96, z: 1}
   m_Children:
   - {fileID: 621106208}
-  - {fileID: 1681262568}
   - {fileID: 817250906}
   - {fileID: 1573935100}
+  - {fileID: 1681262568}
   m_Father: {fileID: 1766748968}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -29568,8 +29623,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09d83af79b28327419b65831b6949140, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerManager: {fileID: 109051348}
   turnOrderPos: 1
   startingLoc: {fileID: 1424507122}
+  board: {fileID: 1220601655}
 --- !u!114 &2132101224
 MonoBehaviour:
   m_ObjectHideFlags: 0

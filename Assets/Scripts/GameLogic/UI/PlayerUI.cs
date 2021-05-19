@@ -11,6 +11,7 @@ public class PlayerUI : MonoBehaviour
 
     public Sprite[] diseaseIconSprites;
     public GameObject[] pawns;
+    public Sprite[] pawnSprites;
 
     public void setPlayers(List<GameObject> players){
         this.players = players;
@@ -36,8 +37,7 @@ public class PlayerUI : MonoBehaviour
             playerHandIcons[player.turnOrderPos - 1][i].sprite = diseaseIconSprites[(int)card.getColour()];
             i++;
         }
-        //Debug.Log("hand size " + hand.Count +" : i " + i);
-        for (; i < ConstantVals.MAX_HAND_SIZE; i++){
+        for (; i < Vals.MAX_HAND_SIZE; i++){
             playerHands[player.turnOrderPos - 1][i].text = "";
             playerHandIcons[player.turnOrderPos - 1][i].sprite = null;
         }
