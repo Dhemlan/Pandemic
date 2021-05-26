@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ConstantVals
+public class Vals
 {
     public static string[] cities = {"Johannesburg","Khartoum","Kinshasa","Lagos","Sao Paulo","Buenos Aires","Bogata","Lima","Santiago","Mexico City","Miami",
         "Los Angeles","San Francisco","Chicago","Atlanta","Washington","Montreal","New York","Madrid","London","Paris","Essen","Milan","St Petersburg","Algiers",
@@ -28,22 +28,53 @@ public class ConstantVals
                             new int[]{HONG_KONG,TAIPEI,TOKYO,BEIJING,SEOUL},new int[]{SHANGHAI,SEOUL},new int[]{TOKYO,SHANGHAI,BEIJING}
                         };
 
+    // Set-up
     public const int BASE_INFECTION_RATE = 2;
+    public const int OUTBREAK_COUNT_LIMIT = 8;
+    public const int INITIAL_INFECTION_ROUNDS = 3;
+    public const int CARDS_PER_INITIAL_INFECTION_ROUND = 3; 
+    public const int INITIAL_DISEASE_CUBE_COUNT = 20;
+    public const int DISEASE_COUNT = 4;
+    public static int[] INFECTION_RATE_TRACK = {2,2,2,3,3,4,4};
+    
+    public const int DEFAULT_HAND_LIMIT = 7;
+    public const int DEFAULT_CARDS_TO_CURE = 3;
+
+    // Misc numbers
     public const int OUTBREAK_THRESHOLD = 3;
     public const int CUBES_PER_EPIDEMIC_INFECT = 3;
-    public const int INITIAL_INFECTION_ROUNDS = 3;
-    public const int CARDS_PER_INITIAL_INFECTION_ROUND = 3;
-    public const int OUTBREAK_COUNT_LIMIT = 8;
-    public const int INITIAL_DISEASE_CUBE_COUNT = 20;
 
-    public const float GENERIC_WAIT_TIME = 1.0f;
+    public const int DISEASE_UNCURED = 0;
+    public const int DISEASE_CURED = 1;
+    public const int DISEASE_ERADICATED = 2;
+    
+    // Code-related values
+    public const int MAX_HAND_SIZE = 8;
+    public const float GENERIC_WAIT_TIME = 0.75f;
+    public const int SELECTABLE_PLAYER_CARD = 0;
+    public const int PLAYER_CARD = 1;
+    public const int SELECTABLE_INFECTION_CARD = 2;
+    public const int INFECTION_CARD = 3;
+    
 
     public const string GAME_OVER_OUTBREAKS = "Frequent outbreaks have made the disease uncontainable\nGame Over";
     public const string GAME_OVER_CUBES = "One of the diseases has taken over\nGame Over";
     public const string GAME_OVER_CARDS = "You've ran out of time\n Game Over";
+    public const string GAME_OVER_CURES = "Cures have been found for all disease\nThe world is saved!";
 
-    public enum Colour {YELLOW, BLUE, BLACK, RED};
-    
+    public enum Colour {YELLOW, BLUE, BLACK, RED, EPIDEMIC, EVENT};
+
+    public enum Phase {SET_UP, ACTION, DRAW, INFECTION};
+
+    public static string[] ROLES = {"Contingency Planner", "Dispatcher","Medic","Operations Expert","Quarantine Specialist","Researcher","Scientist"};
+    public const int CONTINGENCY_PLANNER = 0;
+    public const int DISPATCHER = 1;
+    public const int MEDIC = 2;
+    public const int OPERATIONS_EXPERT = 3;
+    public const int QUARANTINE_SPECIALIST = 4;
+    public const int RESEARCHER = 5;
+    public const int SCIENTIST = 6;
+
     public const int JOHANNESBURG = 0;
     public const int KHARTOUM = 1;
     public const int KINSHASA = 2;
