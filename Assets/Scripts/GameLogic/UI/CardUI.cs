@@ -8,8 +8,9 @@ public class CardUI : MonoBehaviour
 {   
     public GameObject map;
     public GameObject cardPrefab;
-    public GameObject cardDisplayArea;
-    public Text cardDisplayInstructionsText;
+    public GameObject centreDisplayArea;
+    public GameObject[] selectablePrefabs;
+    public Text centreDisplayInstructionsText;
 
     public GameObject playerCard1, playerCard2, infectionCard;
     public GameObject playerDiscard, infectionDiscard;
@@ -29,8 +30,8 @@ public class CardUI : MonoBehaviour
 
     private bool proceedSwitch = false;
     private int remainderToSelect;
-    private Nullable<Vals.Colour> cardTypeToSelect;
-    private List<GameObject> displayedCards = new List<GameObject>();
+    private Nullable<Vals.Colour> typeToSelect;
+    private List<GameObject> displayedItems = new List<GameObject>();
 
     public void Start(){
         mapCentre = new Vector3(map.transform.position.x, map.transform.position.y,0);
@@ -124,14 +125,13 @@ public class CardUI : MonoBehaviour
         title.text= "";
     }
 
-    public IEnumerator allowSelectionToDiscard(List<PlayerCard> cards, List<PlayerCard> selectedCards, int numberToDiscard, Nullable<Vals.Colour> colourToDiscard){
-        remainderToSelect = numberToDiscard;
-        cardTypeToSelect = colourToDiscard;
-        displayedCards = new List<GameObject>();
-        string message = "Select " + numberToDiscard + " cards to discard";
-        displayInteractableCards(cards, displayedCards, message);
+    public IEnumerator requestSelectableFromPlayer<T>(List<T> itemsToSelectFrom, List<T> selectedItems, int numberToSelect, Nullable<Vals.Colour> colourToDiscard){
+        remainderToSelect = numberToSelect;
+        typeToSelect = colourToDiscard;
+        displayedItems = new List<GameObject>();
+        string message = "Select " + numberToSelect + " cards to discard";
+        displayInteractables(itemsToSelectFrom, displayedItems, Vals.SELECTABLE_PLAYER_CARD, message);
         proceedSwitch = false;
-        Debug.Log(cardTypeToSelect);
         while (!proceedSwitch){
             yield return new WaitUntil(() => remainderToSelect == 0);
             playerConfirmationButton.gameObject.SetActive(true);
@@ -143,9 +143,10 @@ public class CardUI : MonoBehaviour
                 continue;
             }
             else {
-                selectedCards.Clear();
-                getSelectedCards(displayedCards, selectedCards);
-                if (selectedCards.Count != numberToDiscard){
+                selectedItems.Clear();
+                getselectedItems(displayedItems, selectedItems);
+                Debug.Log(selectedItems.Count);
+                if (selectedItems.Count != numberToSelect){
                     proceedSwitch = false;
                     playerConfirmationButton.gameObject.SetActive(false);
                     continue;
@@ -153,65 +154,40 @@ public class CardUI : MonoBehaviour
             }
         }
         playerConfirmationButton.gameObject.SetActive(false);
-        clearCards(displayedCards);
+        clearInteractables(displayedItems);
     }
-        
 
-    /*
-    public IEnumerator allowSelectionToDiscard(List<PlayerCard> cards, List<PlayerCard> selectedCards, int numberToDiscard){
-        List<GameObject> displayedCards = new List<GameObject>();
-        string message = "Select " + numberToDiscard + " cards to discard";
-        displayInteractableCards(cards, displayedCards, message);
-
-        while (!proceedSwitch){
-            while (selectedCards.Count != numberToDiscard){
-                selectedCards.Clear();
-                yield return new WaitForSeconds(.2f);
-                getSelectedCards(displayedCards, selectedCards);
-            }
-            playerConfirmationButton.gameObject.SetActive(true);
-            yield return new WaitUntil(() => proceedSwitch);
-            if (selectedCards.Count == numberToDiscard && cardMatchRequirements()){
-                break;
-            }
-            else {
-                proceedSwitch = false;
-            }
-        }
-        playerConfirmationButton.gameObject.SetActive(false);
-        clearCards(displayedCards);
-        proceedSwitch = false;
+      public void displayInteractables<T>(List<T> itemsToDisplay, List<GameObject> displayedObjects, int prefabCategory, string message){
+        float prefabWidth = selectablePrefabs[prefabCategory].GetComponent<Renderer>().bounds.size.x;
+        int gap = 2;
+        int count = itemsToDisplay.Count;
+        float position = (count % 2 == 0) ? -((count / 2 - 1) * (prefabWidth + gap) + (prefabWidth + gap)/2) : -(count / 2 * (prefabWidth + gap));
+        centreDisplayArea.SetActive(true);
+        centreDisplayInstructionsText.text = message;
+        foreach (T itemToDisplay in itemsToDisplay){
+            GameObject displayedObject = Instantiate(selectablePrefabs[prefabCategory], new Vector3(position,0,0), Quaternion.identity, centreDisplayArea.transform);
+            ISelectable<T> selectableItem = displayedObject.GetComponent<ISelectable<T>>();
+            selectableItem.populateItemData(itemToDisplay);
+            displayedObject.GetComponent<SpriteRenderer>().sprite = selectableItem.getSprite();
+            displayedObjects.Add(displayedObject);
+            position += prefabWidth + gap;
+        } 
     }
-    */
 
-    public void getSelectedCards(List<GameObject> displayedCards, List<PlayerCard> selectedCards){
-        foreach (GameObject displayedCard in displayedCards){
-            InteractableCard script = displayedCard.GetComponent<InteractableCard>();
+    public void getselectedItems<T>(List<GameObject> displayedItems, List<T> selectedItems){
+        foreach (GameObject displayedItem in displayedItems){
+            InteractableCard script = displayedItem.GetComponent<InteractableCard>();
             if (script.isSelected()){
-                selectedCards.Add(script.getCard());
+               selectedItems.Add((T)(object)script.getSelectedValue());
             }
         }
     }
 
-    public void clearCards(List<GameObject> cards){
-        foreach (GameObject card in cards){
-            Destroy(card);
+    public void clearInteractables(List<GameObject> displayedItems){
+        foreach (GameObject item in displayedItems){
+            Destroy(item);
         }
-        cardDisplayArea.SetActive(false);
-    }
-
-    public void displayInteractableCards(List<PlayerCard> cards, List<GameObject> displayedCards, string message){
-        
-        int i = -25;
-        cardDisplayArea.SetActive(true);
-        cardDisplayInstructionsText.text = message;
-        foreach (PlayerCard card in cards){
-            GameObject displayedCard = Instantiate(cardPrefab, new Vector3(i,0,0), Quaternion.identity, cardDisplayArea.transform);
-            displayedCard.GetComponent<InteractableCard>().populateCardInfo(card, card.getName());
-            displayedCard.GetComponent<SpriteRenderer>().sprite = playerCardFaces[(int)card.getColour()];
-            displayedCards.Add(displayedCard);
-            i+=10;
-        }
+        centreDisplayArea.SetActive(false);
     }
 
     public void proceed(){
@@ -219,10 +195,10 @@ public class CardUI : MonoBehaviour
     }
 
     public void adjustDiscardRequiredCount(int amount, PlayerCard card){
-        if (cardTypeToSelect == null){
+        if (typeToSelect == null){
             remainderToSelect -=amount;
         }
-        else if (card.getColour() == cardTypeToSelect){
+        else if (card.getColour() == typeToSelect){
             remainderToSelect -= amount;
         }
 

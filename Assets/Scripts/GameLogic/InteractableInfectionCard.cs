@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InteractableCard : MonoBehaviour, ISelectable<PlayerCard>
+public class InteractableInfectionCard : MonoBehaviour, ISelectable<InfectionCard>
 {
-    private PlayerCard card;
+    private InfectionCard card;
+    private SpriteRenderer spriteRen;
     public GameObject selectedIcon;
     public Text label;
     private ActionManager actionManager;
@@ -16,16 +17,16 @@ public class InteractableCard : MonoBehaviour, ISelectable<PlayerCard>
     }
 
     public void OnMouseDown(){
-        selectedIcon.SetActive(!selectedIcon.activeSelf);
-        actionManager.handlePresentedPlayerCardClick(selectedIcon.activeSelf, card);
+        //selectedIcon.SetActive(!selectedIcon.activeSelf);
+       // actionManager.handlePresentedPlayerCardClick(selectedIcon.activeSelf, card);
     }
     
-    public void populateItemData(PlayerCard card){
+    public void populateItemData(InfectionCard card){
         this.card = card;
         label.text = card.getName();
     }
 
-    public PlayerCard getSelectedValue(){
+    public InfectionCard getSelectedValue(){
         return card;
     }
 

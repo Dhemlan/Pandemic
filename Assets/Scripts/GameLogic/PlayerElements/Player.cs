@@ -13,14 +13,13 @@ public class Player : MonoBehaviour
     public Location startingLoc;
     public List<PlayerCard> hand = new List<PlayerCard>();
     private List<Location> handLocs = new List<Location>();
-    private int handLimit = Vals.DEFAULT_HAND_LIMIT;
+    private int handLimit = 4;//Vals.DEFAULT_HAND_LIMIT;
     private int maxActions = 4;
 
     public Board board;
 
     public void Awake(){
         curLoc = startingLoc;
-        role = new Role();
         startingLoc.playerEnters(this);
     }
 
@@ -72,7 +71,8 @@ public class Player : MonoBehaviour
     }
 
     public void treatAction(Location loc){
-        if (board.isDiseaseCured(loc.getColour())){
+        bool removeAll = role.treatAction();
+        if (removeAll || board.isDiseaseCured(loc.getColour())){
             Debug.Log("clear to remove all");
             board.removeCubes(loc);
         }
@@ -111,7 +111,19 @@ public class Player : MonoBehaviour
         playerManager.incrementCompletedActions();
     }
 
+    public bool nonStandardMove(Location dest){
+        if (role.nonStandardMove(this)){
+            curLoc = dest;
+            playerManager.incrementCompletedActions();
+            return true;
+        }
+        return false;
+    }
+
     public bool otherMovement(Location dest){
+        if (nonStandardMove(dest)){
+            return true;
+        }
         updateLocationsofHand();
         bool hasCurrentLoc = handLocs.Contains(curLoc);
         bool hasClickedLoc = handLocs.Contains(dest);
@@ -137,15 +149,11 @@ public class Player : MonoBehaviour
 
     public void buildAction(){
         if (curLoc.getResearchStationStatus()) return;
-        foreach (PlayerCard card in hand){
-            if (curLoc.Equals(card.getLocation())){
-                board.buildResearchStation(curLoc);
-                discardCard(card);
-                Debug.Log("building in " + curLoc.getName());
-                playerManager.incrementCompletedActions();
-                break;
-            }
-        }   
+        if (role.buildAction(this)){
+            board.buildResearchStation(curLoc);
+            Debug.Log("building in " + curLoc.getName());
+            playerManager.incrementCompletedActions();
+        } 
     }
 
     public Player shareAction(){
@@ -154,20 +162,15 @@ public class Player : MonoBehaviour
         Player otherPlayer = null;
         if (localPlayers.Count > 1){
             Debug.Log("player nearby");
-            if (handLocs.Contains(curLoc)){
-                Debug.Log("Can give" + curLoc.getName());
-                if(localPlayers[0] == this){
-                    otherPlayer = localPlayers[1];
+            List<PlayerCard> potentialGiveableCards = new List<PlayerCard>();
+            role.findGiveableCards(this, potentialGiveableCards);
+            Debug.Log(potentialGiveableCards.Count);
+            if (potentialGiveableCards.Count > 0){
+                if (localPlayers.Count > 2){
+                    playerManager.requestUserSelectPlayerToInteract(localPlayers);
                 }
-                else {
-                    otherPlayer = localPlayers[0];
-                }
-                PlayerCard cardToTrade = retrieveCardByLoc(curLoc);
-                hand.Remove(cardToTrade);
-                otherPlayer.addCardToHand(cardToTrade);
-                playerManager.incrementCompletedActions();
-                updateLocationsofHand();          
-            }
+                otherPlayer = shareActionGive(potentialGiveableCards);
+            }        
             else {
                 foreach(Player player in localPlayers){
                     if(player != this && player.hasCardByLoc(curLoc)){
@@ -182,7 +185,29 @@ public class Player : MonoBehaviour
                 updateLocationsofHand();
             }
         }
+        Debug.Log(otherPlayer);
         return otherPlayer;
+    }
+
+    public Player shareActionGive(List<PlayerCard> potentialCards){
+        Debug.Log(" player class Can give" + curLoc.getName());
+        List<Player> localPlayers = curLoc.getLocalPlayers();
+        Player otherPlayer;
+        if(localPlayers[0] == this){
+            otherPlayer = localPlayers[1];
+        }
+        else {
+            otherPlayer = localPlayers[0];
+        }
+        PlayerCard cardToTrade = potentialCards[0];
+        hand.Remove(cardToTrade);
+        otherPlayer.addCardToHand(cardToTrade);
+        playerManager.incrementCompletedActions();
+        updateLocationsofHand();
+        return otherPlayer;
+    }
+
+    public void shareActionReceive(){
     }
 
     public void updateLocationsofHand(){
@@ -238,5 +263,17 @@ public class Player : MonoBehaviour
     
     public List<PlayerCard> getHand(){
         return hand;
+    }
+
+    public void setRole(Role role){
+        this.role = role;
+    }
+    
+    public Role getRole(){
+        return role;
+    }
+
+    public int getRoleID(){
+        return role.getID();
     }
 }

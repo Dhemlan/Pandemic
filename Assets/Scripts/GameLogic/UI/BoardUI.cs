@@ -43,7 +43,7 @@ public class BoardUI : MonoBehaviour
             cubes[i].transform.position = new Vector3(loc.transform.position.x - pos, loc.transform.position.y - width, 0);
             pos -= space;
         }
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(.3f);
     }
 
     public void removeCube(Location loc, Vals.Colour colour){

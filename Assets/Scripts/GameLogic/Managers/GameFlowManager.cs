@@ -22,13 +22,17 @@ public class GameFlowManager : MonoBehaviour
     }
 
     private IEnumerator gameFlow(){
-        playerManager.generateCharacters(2);
+        phase = Vals.Phase.SET_UP;
         board.boardSetUp();
+        
+        board.createInfectionDeck();
         //yield return StartCoroutine(board.infectCities());
+        playerManager.generateCharacters(3);
+        board.preparePlayerCards();
+        
         while (true){
             phase = Vals.Phase.ACTION;
             yield return StartCoroutine(playerManager.movePhase());
-            //playerManager.movePhase();
             phase = Vals.Phase.DRAW;
             yield return StartCoroutine(board.drawPhase());
             phase = Vals.Phase.INFECTION;
@@ -44,7 +48,5 @@ public class GameFlowManager : MonoBehaviour
     public void gameOver(string message){
         Debug.Log(message);
         SceneManager.LoadScene("GameOver");
-        
-
     }
 }

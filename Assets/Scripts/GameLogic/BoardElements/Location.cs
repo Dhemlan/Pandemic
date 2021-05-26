@@ -22,10 +22,17 @@ public class Location : MonoBehaviour, IPointerClickHandler
         actionManager.handleLocClick(this);
     }
 
-    public void addCube(Vals.Colour colour){
+    public void addCube(Vals.Colour colour){  
         diseaseCubes[(int)colour]++;
-        //locUi.addCube(Colour);
-        //Debug.Log(colour + " Cube added in " + gameObject.name + ": yellow " + diseaseCubes[0] +" blue " + diseaseCubes[1]);
+    }
+
+    public bool qSpecialistHere(){
+        foreach (Player player in localPlayers){
+            if (player.getRoleID() == Vals.QUARANTINE_SPECIALIST){
+                return true;
+            }
+        }
+        return false;
     }
 
     public bool removeCube(){
@@ -81,4 +88,8 @@ public class Location : MonoBehaviour, IPointerClickHandler
     public List<Player> getLocalPlayers(){
         return localPlayers;
     }
+    /*
+    public bool hasMultipleDiseases(){
+        return diseaseCubes[0] ^ diseaseCubes[1] ^ diseaseCubes[2] ^ diseaseCubes[3];
+    } */
 }

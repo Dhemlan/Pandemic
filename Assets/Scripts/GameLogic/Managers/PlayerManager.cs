@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class PlayerManager : MonoBehaviour
     
     private List<Player> activePlayerScripts = new List<Player>();
     private List<GameObject> activePlayerObjects = new List<GameObject>();
+    private List<Role> availableRoles = new List<Role>();
     private Player curPlayer;
     private int completedActions;
     private int maxActions;
@@ -19,6 +21,45 @@ public class PlayerManager : MonoBehaviour
     
     public GameObject playerArea;
     public GameObject[] allPlayerObjects;
+
+    private System.Random rand = new System.Random();
+
+    public void generateCharacters(int count){
+        populateAvailableRoles();
+        for (int i = 0; i < count; i++){
+            Player newPlayer = allPlayerObjects[i].GetComponent<Player>();
+            activePlayerScripts.Add(newPlayer);
+            //newPlayer.getLocation().playerEnters(newPlayer);
+            activePlayerObjects.Add(allPlayerObjects[i]);
+            activePlayerScripts[i].setRole(provideRandomRole());
+        }
+        curPlayer = activePlayerScripts[0];
+
+        playerUI.preparePlayerUIObjects(activePlayerObjects);
+        int j = 0;
+        foreach(Player player in activePlayerScripts){
+            playerUI.placePawn(j, player.getLocation());
+            j++;
+        }
+    }
+
+    private void populateAvailableRoles(){
+        availableRoles.Add(new ContingencyPlanner());
+        availableRoles.Add(new Dispatcher());
+        availableRoles.Add(new Medic());
+        availableRoles.Add(new OperationsExpert());
+        availableRoles.Add(new QuarantineSpecialist());
+        availableRoles.Add(new Researcher());
+        availableRoles.Add(new Scientist());
+    }
+
+    public Role provideRandomRole(){
+        int index = rand.Next(availableRoles.Count);
+        Role randomRole = availableRoles[index];
+        Debug.Log(randomRole);
+        availableRoles.Remove(randomRole);
+        return randomRole;
+    }
 
     public IEnumerator movePhase(){
         completedActions = 0;
@@ -28,7 +69,6 @@ public class PlayerManager : MonoBehaviour
         board.promptDrawPhase();
         yield return new WaitUntil(() => proceedSwitch);
         proceedSwitch = false;
- 
     }
 
     public void incrementCompletedActions(){
@@ -44,22 +84,6 @@ public class PlayerManager : MonoBehaviour
         addCardToHand(curPlayer, card);
     }
 
-    public void generateCharacters(int count){
-        for (int i = 0; i < count; i++){
-            Player newPlayer = allPlayerObjects[i].GetComponent<Player>();
-            activePlayerScripts.Add(newPlayer);
-            //newPlayer.getLocation().playerEnters(newPlayer);
-
-            activePlayerObjects.Add(allPlayerObjects[i]);
-        }
-        curPlayer = activePlayerScripts[0];
-
-        playerUI.setPlayers(activePlayerObjects);
-        playerUI.displayPlayers();
-        playerUI.placePawn(0, activePlayerScripts[0].getLocation());
-        playerUI.placePawn(1, activePlayerScripts[1].getLocation());
-    }
-
     public void addCardToHand(Player player, PlayerCard card){
         player.addCardToHand(card);
         playerUI.updateHand(player, player.getHand());
@@ -73,10 +97,10 @@ public class PlayerManager : MonoBehaviour
         int numberCardsToDiscard = player.overHandLimit();
         if (numberCardsToDiscard > 0){
             List<PlayerCard> toDiscard = new List<PlayerCard>();
-            yield return StartCoroutine(cardUI.allowSelectionToDiscard(player.getHand(), toDiscard, numberCardsToDiscard, null));
+            yield return StartCoroutine(cardUI.requestSelectableFromPlayer(player.getHand(), toDiscard, numberCardsToDiscard, null));
             player.discardCards(toDiscard);
             foreach (PlayerCard card in toDiscard){
-                board.discardCard(card);
+              //  board.discardCard(card);
                 // discard animation yield return StartCoroutine(cardUI.)
             }
             playerUI.updateHand(player, player.getHand());
@@ -141,8 +165,13 @@ public class PlayerManager : MonoBehaviour
         return localPlayers;
     }
 
+    public void requestUserSelectPlayerToInteract(List<Player> players){
+        Debug.Log("more than 2 players");
+
+    }
+
     public void updateHand(Player player){
         playerUI.updateHand(player, player.getHand());
     }
-
+    
 }

@@ -20,6 +20,8 @@ public class ActionManager : MonoBehaviour
                 Debug.Log("at location");
                 //request cure status and cube status
                 // need to bypass no cubes scenario
+                Debug.Log("Treat");
+                //Debug.Log(loc.hasMultipleDiseases());
                 player.treatAction(loc);
             }
     
@@ -62,6 +64,7 @@ public class ActionManager : MonoBehaviour
                     break;
                 case "TreatAction":
                     Debug.Log("Treat");
+                    
                     actionTaker.treatAction(actionTaker.getLocation());
                     break;
                 case "ShareAction":
@@ -69,7 +72,9 @@ public class ActionManager : MonoBehaviour
                     Player otherPlayer = actionTaker.shareAction();
                     if (otherPlayer != null){
                         playerUI.updateHand(actionTaker, actionTaker.getHand());
+                        //yield return StartCoroutine(playerManager.checkHandLimit(actionTaker));
                         playerUI.updateHand(otherPlayer, otherPlayer.getHand());
+                        //yield return StartCoroutine(playerManager.checkHandLimit(otherPlayer));
                     }
                     
                     break;
@@ -93,6 +98,7 @@ public class ActionManager : MonoBehaviour
                     break;
             }
         }
+        //yield break;
     }
 
     public void handlePresentedPlayerCardClick (bool selected, PlayerCard card){
