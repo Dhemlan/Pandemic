@@ -8,15 +8,11 @@ public class CardUI : MonoBehaviour
 {   
     public GameObject map;
     public GameObject cardPrefab;
-    public GameObject centreDisplayArea;
-    public GameObject[] selectablePrefabs;
-    public Text centreDisplayInstructionsText;
 
     public GameObject playerCard1, playerCard2, infectionCard;
     public GameObject playerDiscard, infectionDiscard;
     public GameObject playerDeck, infectionDeck;
     public Text playerCard1Title, playerCard2Title, infectionCardTitle;
-    public Button playerConfirmationButton;
 
     public Sprite playerCardFace, playerCardBack, infectionCardBack;
     public Sprite[] infectionCardFaces;
@@ -28,10 +24,7 @@ public class CardUI : MonoBehaviour
     private Vector3 playerDiscardCentre, infectionDiscardCentre;
     private Vector3[] handCentres = new Vector3[4];
 
-    private bool proceedSwitch = false;
-    private int remainderToSelect;
-    private Nullable<Vals.Colour> typeToSelect;
-    private List<GameObject> displayedItems = new List<GameObject>();
+    
 
     public void Start(){
         mapCentre = new Vector3(map.transform.position.x, map.transform.position.y,0);
@@ -90,14 +83,14 @@ public class CardUI : MonoBehaviour
         var t = 0f;
         while(t < 1)
         {
-                t += Time.deltaTime / Vals.GENERIC_WAIT_TIME;
-                transform.position = Vector3.Lerp(currentPos, newPosition, t);      
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(new Vector3(0,180,0)), t);
-                transform.localScale =  Vector3.Lerp(transform.localScale, scale, t);
-                SpriteRenderer spriteRen = transform.GetComponent<SpriteRenderer>();
-                spriteRen.sortingLayerName = "Default";
-                spriteRen.sprite = cardFace;  
-                yield return null;
+            t += Time.deltaTime / Vals.GENERIC_WAIT_TIME;
+            transform.position = Vector3.Lerp(currentPos, newPosition, t);      
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(new Vector3(0,180,0)), t);
+            transform.localScale =  Vector3.Lerp(transform.localScale, scale, t);
+            SpriteRenderer spriteRen = transform.GetComponent<SpriteRenderer>();
+            spriteRen.sortingLayerName = "Default";
+            spriteRen.sprite = cardFace;  
+            yield return null;
         }
     }
     
@@ -125,83 +118,13 @@ public class CardUI : MonoBehaviour
         title.text= "";
     }
 
-    public IEnumerator requestSelectableFromPlayer<T>(List<T> itemsToSelectFrom, List<T> selectedItems, int numberToSelect, Nullable<Vals.Colour> colourToDiscard){
-        remainderToSelect = numberToSelect;
-        typeToSelect = colourToDiscard;
-        displayedItems = new List<GameObject>();
-        string message = "Select " + numberToSelect + " cards to discard";
-        displayInteractables(itemsToSelectFrom, displayedItems, Vals.SELECTABLE_PLAYER_CARD, message);
-        proceedSwitch = false;
-        while (!proceedSwitch){
-            yield return new WaitUntil(() => remainderToSelect == 0);
-            playerConfirmationButton.gameObject.SetActive(true);
-            yield return new WaitUntil(() => proceedSwitch);
-            
-            if (remainderToSelect != 0){
-                Debug.Log(remainderToSelect);
-                proceedSwitch = false;
-                continue;
-            }
-            else {
-                selectedItems.Clear();
-                getselectedItems(displayedItems, selectedItems);
-                Debug.Log(selectedItems.Count);
-                if (selectedItems.Count != numberToSelect){
-                    proceedSwitch = false;
-                    playerConfirmationButton.gameObject.SetActive(false);
-                    continue;
-                }
-            }
-        }
-        playerConfirmationButton.gameObject.SetActive(false);
-        clearInteractables(displayedItems);
-    }
 
-      public void displayInteractables<T>(List<T> itemsToDisplay, List<GameObject> displayedObjects, int prefabCategory, string message){
-        float prefabWidth = selectablePrefabs[prefabCategory].GetComponent<Renderer>().bounds.size.x;
-        int gap = 2;
-        int count = itemsToDisplay.Count;
-        float position = (count % 2 == 0) ? -((count / 2 - 1) * (prefabWidth + gap) + (prefabWidth + gap)/2) : -(count / 2 * (prefabWidth + gap));
-        centreDisplayArea.SetActive(true);
-        centreDisplayInstructionsText.text = message;
-        foreach (T itemToDisplay in itemsToDisplay){
-            GameObject displayedObject = Instantiate(selectablePrefabs[prefabCategory], new Vector3(position,0,0), Quaternion.identity, centreDisplayArea.transform);
-            ISelectable<T> selectableItem = displayedObject.GetComponent<ISelectable<T>>();
-            selectableItem.populateItemData(itemToDisplay);
-            displayedObject.GetComponent<SpriteRenderer>().sprite = selectableItem.getSprite();
-            displayedObjects.Add(displayedObject);
-            position += prefabWidth + gap;
-        } 
-    }
-
-    public void getselectedItems<T>(List<GameObject> displayedItems, List<T> selectedItems){
-        foreach (GameObject displayedItem in displayedItems){
-            InteractableCard script = displayedItem.GetComponent<InteractableCard>();
-            if (script.isSelected()){
-               selectedItems.Add((T)(object)script.getSelectedValue());
-            }
-        }
-    }
-
-    public void clearInteractables(List<GameObject> displayedItems){
-        foreach (GameObject item in displayedItems){
-            Destroy(item);
-        }
-        centreDisplayArea.SetActive(false);
-    }
-
-    public void proceed(){
-        proceedSwitch = true;
-    }
-
-    public void adjustDiscardRequiredCount(int amount, PlayerCard card){
-        if (typeToSelect == null){
-            remainderToSelect -=amount;
-        }
-        else if (card.getColour() == typeToSelect){
-            remainderToSelect -= amount;
-        }
+    public void requestUserSelectSingleSelectable<T>(List<T> itemsToDisplay, int prefabCategory, string message){
 
     }
+
+
+
+
 
 }

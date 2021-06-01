@@ -6,7 +6,7 @@ using System;
 public class PlayerManager : MonoBehaviour
 {
     public PlayerUI playerUI;
-    public CardUI cardUI;
+    public OverlayUI overlayUI;
     public BoardUI boardUI;
 
     public Board board;
@@ -81,33 +81,41 @@ public class PlayerManager : MonoBehaviour
     }
 
     public void drawPhaseAdd(PlayerCard card){
-        addCardToHand(curPlayer, card);
+        curPlayer.addCardToHand(card);
+        playerUI.updateHand(curPlayer, curPlayer.getHand());
     }
 
     public void addCardToHand(Player player, PlayerCard card){
         player.addCardToHand(card);
         playerUI.updateHand(player, player.getHand());
+        StartCoroutine(checkHandLimit(player));
     }
 
-    public void removeCardFromHand(Player player, PlayerCard card){
-        
+    public void removeCardFromHand(Player player, PlayerCard card, bool discard){
+        player.removeCardFromHand(card);
+        if(discard) board.discardCard(card);
+        playerUI.updateHand(player, player.getHand());
     }
 
     public IEnumerator checkHandLimit(Player player){
         int numberCardsToDiscard = player.overHandLimit();
         if (numberCardsToDiscard > 0){
             List<PlayerCard> toDiscard = new List<PlayerCard>();
-            yield return StartCoroutine(cardUI.requestSelectableFromPlayer(player.getHand(), toDiscard, numberCardsToDiscard, null));
-            player.discardCards(toDiscard);
+            yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(player.getHand(), toDiscard, numberCardsToDiscard, null));
+            discardCards(player, toDiscard);
             foreach (PlayerCard card in toDiscard){
-              //  board.discardCard(card);
                 // discard animation yield return StartCoroutine(cardUI.)
             }
-            playerUI.updateHand(player, player.getHand());
         }
         yield break;
     }
     
+    public void discardCards(Player player, List<PlayerCard> toDiscard){
+        foreach (PlayerCard card in toDiscard){
+            removeCardFromHand(player, card, true);
+        }
+    }
+
     public int getInitialHandCount(){
         return (activePlayerScripts.Count % 2 == 0) ? 8 : 9;
     }
@@ -165,13 +173,19 @@ public class PlayerManager : MonoBehaviour
         return localPlayers;
     }
 
-    public void requestUserSelectPlayerToInteract(List<Player> players){
-        Debug.Log("more than 2 players");
+    public IEnumerator requestUserSelectPlayerToInteract(List<Player> players, string message){
+        yield return StartCoroutine(overlayUI.requestSimpleSelectionFromPlayer(players, Vals.SELECTABLE_PLAYER, message));
+    }
 
+    public IEnumerator requestUserSelectCard(List<PlayerCard> cardsToSelectFrom, List<PlayerCard> selectedCards, int numberToSelect, Nullable<Vals.Colour> colourToSelect){
+        yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(cardsToSelectFrom, selectedCards, numberToSelect, colourToSelect));
     }
 
     public void updateHand(Player player){
         playerUI.updateHand(player, player.getHand());
     }
-    
+
+    public void setOtherPlayerInInteraction(Player player){
+        curPlayer.setOtherPlayerInInteraction(player);
+    }
 }

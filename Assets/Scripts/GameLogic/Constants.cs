@@ -49,20 +49,23 @@ public class Vals
     public const int DISEASE_ERADICATED = 2;
     
     // Code-related values
+    public static bool proceed = false;
     public const int MAX_HAND_SIZE = 8;
     public const float GENERIC_WAIT_TIME = 0.75f;
+
     public const int SELECTABLE_PLAYER_CARD = 0;
     public const int PLAYER_CARD = 1;
     public const int SELECTABLE_INFECTION_CARD = 2;
     public const int INFECTION_CARD = 3;
-    
+    public const int SELECTABLE_DISEASE = 4;
+    public const int SELECTABLE_PLAYER = 5;
 
     public const string GAME_OVER_OUTBREAKS = "Frequent outbreaks have made the disease uncontainable\nGame Over";
     public const string GAME_OVER_CUBES = "One of the diseases has taken over\nGame Over";
     public const string GAME_OVER_CARDS = "You've ran out of time\n Game Over";
     public const string GAME_OVER_CURES = "Cures have been found for all disease\nThe world is saved!";
 
-    public enum Colour {YELLOW, BLUE, BLACK, RED, EPIDEMIC, EVENT};
+    public enum Colour {YELLOW, BLUE, BLACK, RED, EVENT, EPIDEMIC};
 
     public enum Phase {SET_UP, ACTION, DRAW, INFECTION};
 

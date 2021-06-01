@@ -7,6 +7,6 @@ public class ActionHandler : MonoBehaviour
     public ActionManager actionManager;
 
     public void OnMouseDown(){
-        actionManager.handleActionButtonClick(this.name);
+        StartCoroutine(actionManager.handleActionButtonClick(this.name));
     }
 }

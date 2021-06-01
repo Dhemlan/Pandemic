@@ -20,6 +20,10 @@ public class BoardUI : MonoBehaviour
 
     public Button drawButton;
 
+    public void boardSetUp(int playerDeckCount){
+        setPlayerDeckCount(playerDeckCount);
+    }
+
     public void setPlayerDeckCount(int newCount){
         playerDeckCountText.text = newCount + "";
     }

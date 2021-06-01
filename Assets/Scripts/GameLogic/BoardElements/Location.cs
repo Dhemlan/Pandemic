@@ -7,7 +7,7 @@ public class Location : MonoBehaviour, IPointerClickHandler
 {
     public ActionManager actionManager;
     public Vals.Colour colour;
-    int[] diseaseCubes = {0,0,0,0};
+    int[] diseaseCubes = {0,0,0,1};
     public List<Location> neighbours = new List<Location>();
     private List<Player> localPlayers = new List<Player>();
 
@@ -88,8 +88,14 @@ public class Location : MonoBehaviour, IPointerClickHandler
     public List<Player> getLocalPlayers(){
         return localPlayers;
     }
-    /*
-    public bool hasMultipleDiseases(){
-        return diseaseCubes[0] ^ diseaseCubes[1] ^ diseaseCubes[2] ^ diseaseCubes[3];
-    } */
+    
+    public List<Vals.Colour> diseasesActiveHere(){
+        List<Vals.Colour> activeDiseases = new List<Vals.Colour>();
+        for (int i = 0; i < diseaseCubes.Length; i++){
+            if (diseaseCubes[i] > 0){
+                activeDiseases.Add((Vals.Colour)i);
+            }
+        }
+        return activeDiseases;
+    } 
 }

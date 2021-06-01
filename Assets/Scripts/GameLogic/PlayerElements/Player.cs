@@ -12,9 +12,11 @@ public class Player : MonoBehaviour
     private Location curLoc;
     public Location startingLoc;
     public List<PlayerCard> hand = new List<PlayerCard>();
-    private List<Location> handLocs = new List<Location>();
     private int handLimit = 4;//Vals.DEFAULT_HAND_LIMIT;
     private int maxActions = 4;
+
+    private Player otherPlayerInInteraction;
+    private PlayerCard cardToTrade;
 
     public Board board;
 
@@ -25,60 +27,28 @@ public class Player : MonoBehaviour
 
     public void addCardToHand(PlayerCard card){
         hand.Add(card);
-        hand.Sort();
-        updateLocationsofHand();
+        hand.Sort();   
     }
 
-    public void discardCards(List<PlayerCard> cards){
-        foreach(PlayerCard card in cards){
-            hand.Remove(card);
-            board.discardCard(card);
-        }
-        updateLocationsofHand();
+    public void removeCardFromHand(PlayerCard card){
+        hand.Remove(card); 
     }
+
+
 
     public void discardCard(PlayerCard card){
-        hand.Remove(card);
-        board.discardCard(card);
-        updateLocationsofHand();
+        hand.Remove(card); 
     }
 
-    // return cards required to cure
-    public int roleModifiedCardsToCure(int standardCardsToCure){
-        return standardCardsToCure - (standardCardsToCure - role.getCardsToCure());
-    }
-
-    public Nullable<Vals.Colour> determineCureActionAvailable(int[] cardCureRequirements, bool researchStationAvailable){
-        if (researchStationAvailable){
-            int[] cardsOfEachColour = new int[Vals.DISEASE_COUNT];
-            PlayerCard prev = hand[0];
-            int colourCount = 1;
-            int cardsToCure = roleModifiedCardsToCure(cardCureRequirements[(int)prev.getColour()]);
-            for (int i = 1; i < hand.Count; i++){
-                if (hand[i].getColour() == prev.getColour() && !board.isDiseaseCured(hand[i].getColour())){
-                    colourCount++;
-                    if (colourCount == cardsToCure){
-                        return prev.getColour();
-                    }
-                }
-                else {
-                    colourCount = 1;
-                }
-                prev = hand[i];
-            }
-        }
-        return null;
-    }
-
-    public void treatAction(Location loc){
+    public void treatAction(Location loc, Vals.Colour colour){
         bool removeAll = role.treatAction();
-        if (removeAll || board.isDiseaseCured(loc.getColour())){
+        if (removeAll || board.isDiseaseCured(colour)){
             Debug.Log("clear to remove all");
-            board.removeCubes(loc);
+            board.removeCubes(loc, colour);
         }
         else {
             Debug.Log("remove single cube");
-            board.removeCube(loc);
+            board.removeCube(loc, colour);
         }
         playerManager.incrementCompletedActions();
     }
@@ -99,14 +69,14 @@ public class Player : MonoBehaviour
 
     public void commercialFlightAction(Location dest){
         Debug.Log("commerical");
-        discardCard(hand[(handLocs.IndexOf(dest))]);
+        playerManager.removeCardFromHand(this, retrieveCardByLoc(dest), true);
         curLoc = dest;
         playerManager.incrementCompletedActions();
     }
 
     public void charterFlightAction(Location dest){
         Debug.Log("charter");
-        discardCard(hand[(handLocs.IndexOf(curLoc))]);
+        playerManager.removeCardFromHand(this, retrieveCardByLoc(curLoc), true);
         curLoc = dest;
         playerManager.incrementCompletedActions();
     }
@@ -124,9 +94,9 @@ public class Player : MonoBehaviour
         if (nonStandardMove(dest)){
             return true;
         }
-        updateLocationsofHand();
-        bool hasCurrentLoc = handLocs.Contains(curLoc);
-        bool hasClickedLoc = handLocs.Contains(dest);
+        
+        bool hasCurrentLoc = hasCardByLoc(curLoc);
+        bool hasClickedLoc = hasCardByLoc(dest);
 
         Debug.Log("Other movement" + hasCurrentLoc + hasClickedLoc);
         if (hasCurrentLoc && hasClickedLoc){
@@ -156,85 +126,118 @@ public class Player : MonoBehaviour
         } 
     }
 
-    public Player shareAction(){
+    public IEnumerator shareAction(){
         Debug.Log("Player share action");
         List<Player> localPlayers = curLoc.getLocalPlayers();
-        Player otherPlayer = null;
         if (localPlayers.Count > 1){
-            Debug.Log("player nearby");
-            List<PlayerCard> potentialGiveableCards = new List<PlayerCard>();
-            role.findGiveableCards(this, potentialGiveableCards);
-            Debug.Log(potentialGiveableCards.Count);
-            if (potentialGiveableCards.Count > 0){
-                if (localPlayers.Count > 2){
-                    playerManager.requestUserSelectPlayerToInteract(localPlayers);
+            List<PlayerCard> potentialTradeableCards = new List<PlayerCard>();
+            role.findGiveableCards(this, potentialTradeableCards);
+            foreach (Player player in localPlayers){
+                if (player != this){
+                    player.getRole().findGiveableCards(player, potentialTradeableCards);
                 }
-                otherPlayer = shareActionGive(potentialGiveableCards);
-            }        
-            else {
-                foreach(Player player in localPlayers){
-                    if(player != this && player.hasCardByLoc(curLoc)){
-                        Debug.Log("can take " + curLoc.getName());
-                        otherPlayer = player;
-                        PlayerCard cardToTrade = otherPlayer.retrieveCardByLoc(curLoc);
-                        addCardToHand(cardToTrade);
-                        otherPlayer.getHand().Remove(cardToTrade);
-                        playerManager.incrementCompletedActions();     
+            }
+            Debug.Log("Potential cards: " + potentialTradeableCards.Count);
+            if (potentialTradeableCards.Count > 0){
+                if (potentialTradeableCards.Count > 1){
+                    Debug.Log("1a - select card to trade");
+                    List<PlayerCard> selectedCards = new List<PlayerCard>();
+                    yield return StartCoroutine(playerManager.requestUserSelectCard(potentialTradeableCards, selectedCards, 1, null));
+                }
+                else {
+                    cardToTrade = potentialTradeableCards[0];
+                    Debug.Log("1b - trade " + cardToTrade.getName());
+                }
+
+                Player cardOwner = this;
+                foreach (Player player in localPlayers){
+                    if (player == this) continue;
+                    if (player.hasCard(cardToTrade)){
+                        // Case: current player receives
+                        Debug.Log("receiving" + cardToTrade);
+                        cardExchange(cardToTrade, player, this);
+                        playerManager.incrementCompletedActions();
+                        yield break;
                     }
                 }
-                updateLocationsofHand();
+                // Current player gives
+                Debug.Log("giving");
+                if (localPlayers.Count > 2){
+                    //request target
+                    Debug.Log("choose who to give to");
+                    string message = "Select player to trade with";
+                    yield return StartCoroutine(playerManager.requestUserSelectPlayerToInteract(localPlayers, message));
+                }
+                else{
+                    if (localPlayers[0] == this){
+                        otherPlayerInInteraction = localPlayers[1];
+                    }
+                    else {
+                        otherPlayerInInteraction = localPlayers[0];
+                    }
+                }
+                cardExchange(cardToTrade, this, otherPlayerInInteraction);
+                playerManager.incrementCompletedActions();
+            }        
+        }   
+    }
+
+    public void cardExchange(PlayerCard card, Player provider, Player receiver){
+        playerManager.removeCardFromHand(provider, card, false);
+        playerManager.addCardToHand(receiver, card);
+    }
+
+    // return cards required to cure
+    public int roleModifiedCardsToCure(int standardCardsToCure){
+        return standardCardsToCure - (standardCardsToCure - role.getCardsToCure());
+    }
+
+    public Nullable<Vals.Colour> determineCureActionAvailable(int[] cardCureRequirements, bool researchStationAvailable){
+        if (researchStationAvailable){
+            int[] cardsOfEachColour = new int[Vals.DISEASE_COUNT];
+            PlayerCard prev = hand[0];
+            int colourCount = 1;
+            int cardsToCure = roleModifiedCardsToCure(cardCureRequirements[(int)prev.getColour()]);
+            for (int i = 1; i < hand.Count; i++){
+                if (hand[i].getColour() == prev.getColour() && !board.isDiseaseCured(hand[i].getColour())){
+                    colourCount++;
+                    if (colourCount == cardsToCure){
+                        return prev.getColour();
+                    }
+                }
+                else {
+                    colourCount = 1;
+                }
+                prev = hand[i];
             }
         }
-        Debug.Log(otherPlayer);
-        return otherPlayer;
-    }
-
-    public Player shareActionGive(List<PlayerCard> potentialCards){
-        Debug.Log(" player class Can give" + curLoc.getName());
-        List<Player> localPlayers = curLoc.getLocalPlayers();
-        Player otherPlayer;
-        if(localPlayers[0] == this){
-            otherPlayer = localPlayers[1];
-        }
-        else {
-            otherPlayer = localPlayers[0];
-        }
-        PlayerCard cardToTrade = potentialCards[0];
-        hand.Remove(cardToTrade);
-        otherPlayer.addCardToHand(cardToTrade);
-        playerManager.incrementCompletedActions();
-        updateLocationsofHand();
-        return otherPlayer;
-    }
-
-    public void shareActionReceive(){
-    }
-
-    public void updateLocationsofHand(){
-        handLocs.Clear();
-        foreach (PlayerCard card in hand){
-            handLocs.Add(card.getLocation());
-        }
+        return null;
     }
 
     public void incrementCompletedActions(){
         playerManager.incrementCompletedActions();
     }
 
-    public bool hasCardByLoc(Location loc){
-        if (handLocs.Contains(loc)) return true;
-        return false;
+    public bool hasCard(PlayerCard card){
+        return hand.Contains(card);
     }
 
-        public void getLocationsInHand(List<Location> locs){
+    public bool hasCardByLoc(Location loc){
         foreach (PlayerCard card in hand){
-            locs.Add(card.getLocation());
+            Location cardLoc = card.getLocation();
+            if(cardLoc != null && cardLoc.Equals(loc)){
+                Debug.Log("has " + loc.getName());
+                return true;
+            }
         }
+        return false;
     }
 
     public PlayerCard retrieveCardByLoc(Location loc){
         foreach(PlayerCard card in hand){
-            if (card.getLocation().Equals(loc)){
+            Location cardLoc = card.getLocation();
+            Debug.Log(card.getName());
+            if (cardLoc.Equals(loc)){
                 return card;
             }
         }
@@ -275,5 +278,9 @@ public class Player : MonoBehaviour
 
     public int getRoleID(){
         return role.getID();
+    }
+
+    public void setOtherPlayerInInteraction(Player player){
+        otherPlayerInInteraction = player;
     }
 }

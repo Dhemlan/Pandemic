@@ -13,6 +13,7 @@ public class GameFlowManager : MonoBehaviour
     public PlayerManager playerManager;
 
     private int characterCount = 2;
+    private int epidemicCardCount = 6;
     private Vals.Phase phase;
 
     void Start()
@@ -22,14 +23,9 @@ public class GameFlowManager : MonoBehaviour
     }
 
     private IEnumerator gameFlow(){
+        
         phase = Vals.Phase.SET_UP;
-        board.boardSetUp();
-        
-        board.createInfectionDeck();
-        //yield return StartCoroutine(board.infectCities());
-        playerManager.generateCharacters(3);
-        board.preparePlayerCards();
-        
+        yield return StartCoroutine(board.boardSetUp(epidemicCardCount));  
         while (true){
             phase = Vals.Phase.ACTION;
             yield return StartCoroutine(playerManager.movePhase());
@@ -44,6 +40,7 @@ public class GameFlowManager : MonoBehaviour
     public Vals.Phase getPhase(){
         return phase;
     }
+
 
     public void gameOver(string message){
         Debug.Log(message);
