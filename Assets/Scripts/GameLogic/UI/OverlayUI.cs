@@ -39,9 +39,11 @@ public class OverlayUI : MonoBehaviour{
     }
 
     public IEnumerator requestSimpleSelectionFromPlayer<T>(List<T> itemsToSelectFrom, int prefabCategory, string message){
+        Debug.Log("overlay called");
         toggleBoardInteractions();
         displayedItems = new List<GameObject>();
         displayInteractables(itemsToSelectFrom, displayedItems, prefabCategory, message);
+        Vals.proceed = false;
         yield return new WaitUntil(() => Vals.proceed);
         clearInteractables();
         Vals.proceed = false;
@@ -69,7 +71,7 @@ public class OverlayUI : MonoBehaviour{
         remainderToSelect = numberToSelect;
         typeToSelect = colourToDiscard;
         displayedItems = new List<GameObject>();
-        string message = "Select " + numberToSelect + " cards to discard";
+        string message = "Discard cards: " + numberToSelect + " required";
         displayInteractables(itemsToSelectFrom, displayedItems, Vals.SELECTABLE_PLAYER_CARD, message);
         Vals.proceed = false;
         while (!Vals.proceed){
@@ -107,10 +109,6 @@ public class OverlayUI : MonoBehaviour{
         }
     }
     
-    public void proceed(){
-        Vals.proceed = true;
-    }
-
     public void adjustDiscardRequiredCount(int amount, PlayerCard card){
         if (typeToSelect == null){
             remainderToSelect -=amount;

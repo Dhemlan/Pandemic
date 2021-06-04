@@ -25,27 +25,7 @@ public class ActionManager : MonoBehaviour
             }
             else {
                 Debug.Log("not here");
-                if (player.getLocation().getResearchStationStatus() && loc.getResearchStationStatus()){
-                    Debug.Log("shuttle flight");
-                    player.getLocation().playerLeaves(player);
-                    player.shuttleFlightAction(loc);
-                    loc.playerEnters(player);
-                }
-                else if (player.isDriveFerryValid(loc)){
-                    Debug.Log("drive/ferry");
-                    player.getLocation().playerLeaves(player);
-                    player.driveFerryAction(loc);
-                    loc.playerEnters(player);
-                }
-                else {
-                    Location curLoc = player.getLocation();
-                    if (player.otherMovement(loc)){
-                        curLoc.playerLeaves(player);
-                        playerUI.updateHand(player, player.getHand());
-                        loc.playerEnters(player);  
-                    }
-                }
-                playerManager.placePawn(player);
+                StartCoroutine(playerManager.potentialPlayerMovement(player, loc));
             }
         }
     }

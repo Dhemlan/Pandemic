@@ -2396,7 +2396,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 3
   m_Sprite: {fileID: 3286163911610860551, guid: 0a37ca8c45e30b94fbb86d3d8f9dbbdb,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3608,7 +3608,7 @@ PrefabInstance:
     - target: {fileID: 5302794731439956359, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1.5100021
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5611439884394071808, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
@@ -3713,7 +3713,7 @@ PrefabInstance:
     - target: {fileID: 5817834797937624113, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -15
+      value: -115
       objectReference: {fileID: 0}
     - target: {fileID: 5817834797937624113, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
@@ -3723,7 +3723,7 @@ PrefabInstance:
     - target: {fileID: 5817834797937624113, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5817834797937624113, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
@@ -3733,7 +3733,7 @@ PrefabInstance:
     - target: {fileID: 5817834797937624113, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5817834797937624113, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
@@ -4224,7 +4224,7 @@ PrefabInstance:
     - target: {fileID: 5302794731439956359, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1.5100021
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5611439884394071808, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
@@ -4903,7 +4903,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 3
   m_Sprite: {fileID: 3286163911610860551, guid: a0344fc9da560eb4d970414a87f9d3b0,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -15863,7 +15863,7 @@ GameObject:
   m_Component:
   - component: {fileID: 871334089}
   m_Layer: 0
-  m_Name: Block clicking on locations through UI elements
+  m_Name: Make Event cards Untradeable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17372,36 +17372,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nextCircle: {fileID: 727871276}
---- !u!1 &972975761
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 972975762}
-  m_Layer: 0
-  m_Name: Duplicate roles/Ops expert broken
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &972975762
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 972975761}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1142937351}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &976110606
 GameObject:
   m_ObjectHideFlags: 0
@@ -19401,7 +19371,6 @@ Transform:
   - {fileID: 1996858440}
   - {fileID: 871334089}
   - {fileID: 257210342}
-  - {fileID: 972975762}
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -28544,7 +28513,7 @@ PrefabInstance:
     - target: {fileID: 5302794731439956359, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1.5100021
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5611439884394071808, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
@@ -32910,7 +32879,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 3
   m_Sprite: {fileID: 3286163911610860551, guid: 0a37ca8c45e30b94fbb86d3d8f9dbbdb,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -35075,7 +35044,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 3
   m_Sprite: {fileID: 3286163911610860551, guid: 0a37ca8c45e30b94fbb86d3d8f9dbbdb,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -38982,7 +38951,7 @@ PrefabInstance:
     - target: {fileID: 5302794731439956359, guid: 696802ad511439343bd3380c24939cad,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1.5100021
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5611439884394071808, guid: 696802ad511439343bd3380c24939cad,
         type: 3}

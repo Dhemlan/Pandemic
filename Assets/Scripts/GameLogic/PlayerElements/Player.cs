@@ -34,8 +34,6 @@ public class Player : MonoBehaviour
         hand.Remove(card); 
     }
 
-
-
     public void discardCard(PlayerCard card){
         hand.Remove(card); 
     }
@@ -54,8 +52,7 @@ public class Player : MonoBehaviour
     }
 
     public void shuttleFlightAction(Location dest){
-        incrementCompletedActions();
-        curLoc = dest;
+        moveCompleted(dest);
     }
 
     public bool isDriveFerryValid(Location dest){
@@ -63,58 +60,73 @@ public class Player : MonoBehaviour
     }
 
     public void driveFerryAction(Location dest){
-        incrementCompletedActions();
-        curLoc = dest;
+        moveCompleted(dest);
     }
 
-    public void commercialFlightAction(Location dest){
-        Debug.Log("commerical");
-        playerManager.removeCardFromHand(this, retrieveCardByLoc(dest), true);
-        curLoc = dest;
-        playerManager.incrementCompletedActions();
+    public void commercialFlightAction(PlayerCard cardToDiscard, Location dest){
+        Debug.Log("commercial");
+        moveRequiringDiscard(cardToDiscard, dest);
     }
 
-    public void charterFlightAction(Location dest){
+    public void charterFlightAction(PlayerCard cardToDiscard, Location dest){
         Debug.Log("charter");
-        playerManager.removeCardFromHand(this, retrieveCardByLoc(curLoc), true);
+        moveRequiringDiscard(cardToDiscard, dest);
+    }
+
+    public void moveRequiringDiscard(PlayerCard cardToDiscard, Location dest){
+        playerManager.removeCardFromHand(this, cardToDiscard, true);
+        moveCompleted(dest);
+    }
+
+    public void moveCompleted(Location dest){
         curLoc = dest;
         playerManager.incrementCompletedActions();
     }
 
-    public bool nonStandardMove(Location dest){
-        if (role.nonStandardMove(this)){
-            curLoc = dest;
-            playerManager.incrementCompletedActions();
-            return true;
+    public IEnumerator otherMovement(Location dest, System.Action<bool> callback){
+        if (role.nonStandardMove(this,dest)){
+            if (role.getID() == Vals.OPERATIONS_EXPERT){
+                List<PlayerCard> selectedCard = new List<PlayerCard>();
+                yield return StartCoroutine(playerManager.requestUserSelectCard(hand, selectedCard, 1, null));
+                playerManager.removeCardFromHand(this, selectedCard[0], true);
+            }
+            moveCompleted(dest);
+            callback(true);
+            yield break;
         }
-        return false;
-    }
+        List<PlayerCard> availableCards = new List<PlayerCard>();
+        PlayerCard currentLocCard = retrieveCardByLoc(curLoc);
+        availableCards.Add(currentLocCard);
+        PlayerCard clickedLocCard = retrieveCardByLoc(dest);
+        availableCards.Add(clickedLocCard);
 
-    public bool otherMovement(Location dest){
-        if (nonStandardMove(dest)){
-            return true;
+        Debug.Log("Other movement" + currentLocCard + clickedLocCard);
+        if (currentLocCard != null && clickedLocCard != null){
+            List<PlayerCard> selectedCard = new List<PlayerCard>();
+            yield return StartCoroutine(playerManager.requestUserSelectCard(availableCards, selectedCard, 1, null));
+            if(selectedCard[0].Equals(currentLocCard)){
+                charterFlightAction(currentLocCard, dest);
+            }
+            else{
+                commercialFlightAction(clickedLocCard, dest);
+            }
+            moveCompleted(dest);
+            callback(true);
+            yield break;
         }
-        
-        bool hasCurrentLoc = hasCardByLoc(curLoc);
-        bool hasClickedLoc = hasCardByLoc(dest);
-
-        Debug.Log("Other movement" + hasCurrentLoc + hasClickedLoc);
-        if (hasCurrentLoc && hasClickedLoc){
-            // request choice
-            curLoc = dest;
-            playerManager.incrementCompletedActions();
-            return true;
-        }
-        else if (hasCurrentLoc){
-            charterFlightAction(dest);
-            return true;
+        else if (currentLocCard != null){
+            charterFlightAction(currentLocCard, dest);
+            callback(true);
+            yield break;
             
         }
-        else if (hasClickedLoc){
-            commercialFlightAction(dest);
-            return true;
+        else if (clickedLocCard != null){
+            commercialFlightAction(clickedLocCard, dest);
+            callback(true);
+            yield break;
         }
-        return false;
+        callback(false);
+        yield break;
     }
 
     public void buildAction(){
@@ -143,6 +155,7 @@ public class Player : MonoBehaviour
                     Debug.Log("1a - select card to trade");
                     List<PlayerCard> selectedCards = new List<PlayerCard>();
                     yield return StartCoroutine(playerManager.requestUserSelectCard(potentialTradeableCards, selectedCards, 1, null));
+                    cardToTrade = selectedCards[0];
                 }
                 else {
                     cardToTrade = potentialTradeableCards[0];
@@ -167,6 +180,7 @@ public class Player : MonoBehaviour
                     Debug.Log("choose who to give to");
                     string message = "Select player to trade with";
                     yield return StartCoroutine(playerManager.requestUserSelectPlayerToInteract(localPlayers, message));
+                    Debug.Log(otherPlayerInInteraction);
                 }
                 else{
                     if (localPlayers[0] == this){
@@ -236,12 +250,15 @@ public class Player : MonoBehaviour
     public PlayerCard retrieveCardByLoc(Location loc){
         foreach(PlayerCard card in hand){
             Location cardLoc = card.getLocation();
-            Debug.Log(card.getName());
-            if (cardLoc.Equals(loc)){
+            if (cardLoc != null && cardLoc.Equals(loc)){
                 return card;
             }
         }
         return null;
+    }
+
+    public void resetOncePerTurnActions(){
+        role.resetOncePerTurnActions();
     }
 
     public void setCurLoc(Location loc){
@@ -281,6 +298,7 @@ public class Player : MonoBehaviour
     }
 
     public void setOtherPlayerInInteraction(Player player){
+        Debug.Log("setting other player");
         otherPlayerInInteraction = player;
     }
 }

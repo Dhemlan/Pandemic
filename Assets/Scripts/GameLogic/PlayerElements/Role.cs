@@ -8,6 +8,8 @@ public class Role
     private bool researchStationRequiredToCure = true;
     protected int id;
     protected string name;
+    protected bool usedThisRound = false;
+    public PlayerManager playerManager;
 
     public int getCardsToCure(){
         return cardsToCure;
@@ -44,6 +46,10 @@ public class Role
         return false;
     }
 
+    public void resetOncePerTurnActions(){
+        usedThisRound = false; 
+    }
+
     public virtual void findGiveableCards(Player player, List<PlayerCard> potentialCards){
         if (player.hasCardByLoc(player.getLocation())){
             Debug.Log("can give " + player.getLocation());
@@ -51,7 +57,7 @@ public class Role
         }
     }
 
-    public virtual bool nonStandardMove(Player player){
+    public virtual bool nonStandardMove(Player player, Location loc){
         return false;
     }
 }

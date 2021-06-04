@@ -77,6 +77,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     public void endPlayerTurn(){
+        curPlayer.resetOncePerTurnActions();
         nextPlayer();
     }
 
@@ -127,6 +128,32 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    public IEnumerator potentialPlayerMovement(Player player, Location loc){
+        if (player.getLocation().getResearchStationStatus() && loc.getResearchStationStatus()){
+            Debug.Log("shuttle flight");
+            player.getLocation().playerLeaves(player);
+            player.shuttleFlightAction(loc);
+            loc.playerEnters(player);
+        }
+        else if (player.isDriveFerryValid(loc)){
+            Debug.Log("drive/ferry");
+            player.getLocation().playerLeaves(player);
+            player.driveFerryAction(loc);
+            loc.playerEnters(player);
+        }
+        else {
+            Location curLoc = player.getLocation();
+            yield return StartCoroutine(player.otherMovement(loc, (movementCompleted) =>{
+                if (movementCompleted){
+                    curLoc.playerLeaves(player);
+                    playerUI.updateHand(player, player.getHand());
+                    loc.playerEnters(player);
+                }
+            }));
+        }
+        placePawn(player);
+    }
+
     private void nextPlayer(){
         if(curPlayer.turnOrderPos == activePlayerScripts.Count){
             curPlayer = activePlayerScripts[0];
@@ -174,6 +201,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     public IEnumerator requestUserSelectPlayerToInteract(List<Player> players, string message){
+        Debug.Log("requesting from overlayUI");
         yield return StartCoroutine(overlayUI.requestSimpleSelectionFromPlayer(players, Vals.SELECTABLE_PLAYER, message));
     }
 

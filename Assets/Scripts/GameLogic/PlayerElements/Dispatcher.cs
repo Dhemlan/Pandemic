@@ -8,4 +8,12 @@ public class Dispatcher : Role
         id = Vals.DISPATCHER;
         name = Vals.ROLES[id];
     }
+
+    public override bool nonStandardMove(Player player, Location dest){
+        Debug.Log("dispatcher move");
+        if (dest.getLocalPlayers().Count > 0){
+            return true;
+        }
+        return false;
+    }
 }

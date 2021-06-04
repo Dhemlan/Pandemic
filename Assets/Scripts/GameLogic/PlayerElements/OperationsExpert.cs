@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class OperationsExpert : Role
 {
+
+
     public OperationsExpert(){
         id = Vals.OPERATIONS_EXPERT;
         name = Vals.ROLES[id];
@@ -14,8 +16,9 @@ public class OperationsExpert : Role
         return true;
     }
 
-    public override bool nonStandardMove(Player player){
-        if(player.getLocation().getResearchStationStatus()){
+    public override bool nonStandardMove(Player player, Location loc){
+        if(player.getLocation().getResearchStationStatus() && player.getHand().Count > 0 && !usedThisRound){
+            usedThisRound = true;
             return true;
         }
         return false;

@@ -27,7 +27,7 @@ public class PlayerUI : MonoBehaviour
             // Assign sprites
             int role = player.GetComponent<Player>().getRoleID();
             player.transform.Find("Pawn").GetComponent<SpriteRenderer>().sprite = pawnSprites[role];
-            player.transform.Find("PlayerName").GetComponent<Text>().text = Vals.ROLES[i];
+            player.transform.Find("PlayerName").GetComponent<Text>().text = Vals.ROLES[role];
             pawns[i].GetComponent<SpriteRenderer>().sprite = pawnSprites[role];
             i++;
         }
