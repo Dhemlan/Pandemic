@@ -26,7 +26,6 @@ public class OverlayUI : MonoBehaviour{
         int gap = 2;
         int count = itemsToDisplay.Count;
         float position = (count % 2 == 0) ? -((count / 2 - 1) * (prefabWidth + gap) + (prefabWidth + gap)/2) : -(count / 2 * (prefabWidth + gap));
-        centreDisplayArea.SetActive(true);
         centreDisplayInstructionsText.text = message;
         foreach (T itemToDisplay in itemsToDisplay){
             GameObject displayedObject = Instantiate(selectablePrefabs[prefabCategory], new Vector3(position,0,0), Quaternion.identity, displayedPrefabsParent.transform);
@@ -38,22 +37,31 @@ public class OverlayUI : MonoBehaviour{
         } 
     }
 
-    public IEnumerator requestSimpleSelectionFromPlayer<T>(List<T> itemsToSelectFrom, int prefabCategory, string message){
-        Debug.Log("overlay called");
-        toggleBoardInteractions();
-        displayedItems = new List<GameObject>();
-        displayInteractables(itemsToSelectFrom, displayedItems, prefabCategory, message);
-        Vals.proceed = false;
-        yield return new WaitUntil(() => Vals.proceed);
+    public void activateInteractableOverlay(){
         clearInteractables();
+        centreDisplayArea.SetActive(true);
+        setBoardInteractions(false);
         Vals.proceed = false;
     }
 
-    public IEnumerator displayItemsUntilClosed<T>(List<T> itemsToSelectFrom, int prefabCategory, string message){
+    public void deactivateInteractableOverlay(){
+        centreDisplayArea.SetActive(false);
+        setBoardInteractions(true);
+        Vals.proceed = false;
+        playerConfirmationButton.gameObject.SetActive(false);
+    }
 
+    public IEnumerator requestSimpleSelectionFromPlayer<T>(List<T> itemsToSelectFrom, int prefabCategory, string message){
+        activateInteractableOverlay();      
+        displayedItems = new List<GameObject>();
+        displayInteractables(itemsToSelectFrom, displayedItems, prefabCategory, message);
+        yield return new WaitUntil(() => Vals.proceed);
+        deactivateInteractableOverlay();
+    }
+
+    public IEnumerator displayItemsUntilClosed<T>(List<T> itemsToSelectFrom, int prefabCategory, string message){
         playerConfirmationButton.gameObject.SetActive(true);
         yield return StartCoroutine(requestSimpleSelectionFromPlayer(itemsToSelectFrom, prefabCategory, message));
-        playerConfirmationButton.gameObject.SetActive(false);
     }
 
     public void clearInteractables(){
@@ -62,54 +70,56 @@ public class OverlayUI : MonoBehaviour{
         for (int i = 1; i < toDestroy.Length; i++){
             Destroy(toDestroy[i].gameObject);
         }
-        centreDisplayArea.SetActive(false);
-        toggleBoardInteractions();
     }
 
-    public IEnumerator requestSelectableFromPlayer<T>(List<T> itemsToSelectFrom, List<T> selectedItems, int numberToSelect, Nullable<Vals.Colour> colourToDiscard){
-        toggleBoardInteractions();
+    public IEnumerator requestSelectableFromPlayer<T>(List<T> itemsToSelectFrom, List<T> selectedItems, int prefabCategory, int numberToSelect, Nullable<Vals.Colour> colourToDiscard){  
         remainderToSelect = numberToSelect;
         typeToSelect = colourToDiscard;
         displayedItems = new List<GameObject>();
         string message = "Discard cards: " + numberToSelect + " required";
-        displayInteractables(itemsToSelectFrom, displayedItems, Vals.SELECTABLE_PLAYER_CARD, message);
-        Vals.proceed = false;
+        activateInteractableOverlay();
+        displayInteractables(itemsToSelectFrom, displayedItems, prefabCategory, message);
+        Debug.Log("starting loop " + Vals.proceed);
         while (!Vals.proceed){
+            Debug.Log("remainder to select" + remainderToSelect);
             yield return new WaitUntil(() => remainderToSelect == 0);
             playerConfirmationButton.gameObject.SetActive(true);
             yield return new WaitUntil(() => Vals.proceed);
-            
+            Debug.Log("remainder" + remainderToSelect);
             if (remainderToSelect != 0){
-                Debug.Log(remainderToSelect);
                 Vals.proceed = false;
+                playerConfirmationButton.gameObject.SetActive(false);
+                Debug.Log("remainder not correct, relooping");
                 continue;
             }
             else {
                 selectedItems.Clear();
                 getselectedItems(displayedItems, selectedItems);
-                Debug.Log(selectedItems.Count);
+                Debug.Log("Selected: " + selectedItems.Count);
                 if (selectedItems.Count != numberToSelect){
                     Vals.proceed = false;
                     playerConfirmationButton.gameObject.SetActive(false);
+                    Debug.Log("cards rejected");
                     continue;
                 }
+                Debug.Log("cards accepted");
             }
         }
-        playerConfirmationButton.gameObject.SetActive(false);
-        clearInteractables();
+        Debug.Log("deactivating overlay");
+        deactivateInteractableOverlay();
         yield break;
     }
 
     public void getselectedItems<T>(List<GameObject> displayedItems, List<T> selectedItems){
         foreach (GameObject displayedItem in displayedItems){
-            InteractableCard script = displayedItem.GetComponent<InteractableCard>();
+            ISelectable<T> script = displayedItem.GetComponent<ISelectable<T>>();
             if (script.isSelected()){
                selectedItems.Add((T)(object)script.getSelectedValue());
             }
         }
     }
-    
-    public void adjustDiscardRequiredCount(int amount, PlayerCard card){
+
+    public void adjustDiscardRequiredCount(int amount, Card card){
         if (typeToSelect == null){
             remainderToSelect -=amount;
         }
@@ -118,24 +128,29 @@ public class OverlayUI : MonoBehaviour{
         }
     }
 
-    private void toggleBoardInteractions(){
-        toggleBoxColliders();
-        toggleCircleColliders();
+    private void setBoardInteractions(bool value){
+        setBoxColliders(value);
+        setCircleColliders(value);
     }
 
-    private void toggleBoxColliders(){
+    private void setBoxColliders(bool value){
         foreach(BoxCollider2D collider in boxColliders){
-            collider.enabled = !collider.enabled;
+            collider.enabled = value;
         }
     }
-    private void toggleCircleColliders(){
+    private void setCircleColliders(bool value){
         foreach(CircleCollider2D collider in circleColliders){
-            collider.enabled = !collider.enabled;
+            collider.enabled = value;
         }
     }
 
     public void gatherColliders(CircleCollider2D[] circleColliders, BoxCollider2D[] boxColliders){
         this.circleColliders = circleColliders;
         this.boxColliders = boxColliders;
+    }
+
+    public void proceed(){
+        Vals.proceed = true;
+        Debug.Log("calling proceed");
     }
 }

@@ -17,4 +17,12 @@ public class DisplayableInfectionCard : MonoBehaviour, ISelectable<InfectionCard
     public Sprite getSprite(){
         return sprites[(int)card.getColour()];
     }
+
+    public bool isSelected(){
+       return false;
+    }
+
+    public InfectionCard getSelectedValue(){
+       return card;
+    }
 }

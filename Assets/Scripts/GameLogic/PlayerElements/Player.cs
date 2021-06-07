@@ -15,9 +15,7 @@ public class Player : MonoBehaviour
     private int handLimit = 4;//Vals.DEFAULT_HAND_LIMIT;
     private int maxActions = 4;
 
-    private Player otherPlayerInInteraction;
     private PlayerCard cardToTrade;
-
     public Board board;
 
     public void Awake(){
@@ -129,11 +127,10 @@ public class Player : MonoBehaviour
         yield break;
     }
 
-    public void buildAction(){
-        if (curLoc.getResearchStationStatus()) return;
+    public IEnumerator buildAction(){
+        if (curLoc.getResearchStationStatus()) yield break;
         if (role.buildAction(this)){
-            board.buildResearchStation(curLoc);
-            Debug.Log("building in " + curLoc.getName());
+            yield return StartCoroutine(board.buildResearchStation(curLoc));
             playerManager.incrementCompletedActions();
         } 
     }
@@ -180,17 +177,16 @@ public class Player : MonoBehaviour
                     Debug.Log("choose who to give to");
                     string message = "Select player to trade with";
                     yield return StartCoroutine(playerManager.requestUserSelectPlayerToInteract(localPlayers, message));
-                    Debug.Log(otherPlayerInInteraction);
                 }
                 else{
                     if (localPlayers[0] == this){
-                        otherPlayerInInteraction = localPlayers[1];
+                        playerManager.setUserSelectedPlayer(localPlayers[1]);
                     }
                     else {
-                        otherPlayerInInteraction = localPlayers[0];
+                        playerManager.setUserSelectedPlayer(localPlayers[0]);
                     }
                 }
-                cardExchange(cardToTrade, this, otherPlayerInInteraction);
+                cardExchange(cardToTrade, this, playerManager.getUserSelectedPlayer());
                 playerManager.incrementCompletedActions();
             }        
         }   
@@ -257,6 +253,14 @@ public class Player : MonoBehaviour
         return null;
     }
 
+    public void leaveLocation(){
+
+    }
+
+    public void enterLocation(Location dest){
+
+    }
+
     public void resetOncePerTurnActions(){
         role.resetOncePerTurnActions();
     }
@@ -295,10 +299,5 @@ public class Player : MonoBehaviour
 
     public int getRoleID(){
         return role.getID();
-    }
-
-    public void setOtherPlayerInInteraction(Player player){
-        Debug.Log("setting other player");
-        otherPlayerInInteraction = player;
     }
 }

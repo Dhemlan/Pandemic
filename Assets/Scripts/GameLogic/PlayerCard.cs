@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class PlayerCard : Card, IComparable<PlayerCard>
 {
+    private bool removeAfterPlaying = false;
 
     public PlayerCard(Location loc, int id, string name){
         this.loc = loc;
@@ -26,6 +27,14 @@ public class PlayerCard : Card, IComparable<PlayerCard>
             return -1;
         }
         else return 1;
+    }
+
+    public void setRemoveAfterPlaying(bool value){
+        removeAfterPlaying = value;
+    }
+
+    public bool getRemoveAfterPlaying(){
+        return removeAfterPlaying;
     }
 
 }

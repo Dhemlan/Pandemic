@@ -18,6 +18,7 @@ public class PlayerManager : MonoBehaviour
     private int completedActions;
     private int maxActions;
     private bool proceedSwitch = false;
+    private Player userSelectedPlayer;
     
     public GameObject playerArea;
     public GameObject[] allPlayerObjects;
@@ -98,11 +99,20 @@ public class PlayerManager : MonoBehaviour
         playerUI.updateHand(player, player.getHand());
     }
 
+    public void removeCardFromHand(PlayerCard card, bool toDiscard){
+        foreach (Player player in activePlayerScripts){
+            if(player.hasCard(card)){
+                removeCardFromHand(player, card, toDiscard);
+                Debug.Log("Discarding " + card.getName() + player);
+            }
+        }
+    }
+
     public IEnumerator checkHandLimit(Player player){
         int numberCardsToDiscard = player.overHandLimit();
         if (numberCardsToDiscard > 0){
             List<PlayerCard> toDiscard = new List<PlayerCard>();
-            yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(player.getHand(), toDiscard, numberCardsToDiscard, null));
+            yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(player.getHand(), toDiscard, Vals.SELECTABLE_PLAYER_CARD, numberCardsToDiscard, null));
             discardCards(player, toDiscard);
             foreach (PlayerCard card in toDiscard){
                 // discard animation yield return StartCoroutine(cardUI.)
@@ -127,30 +137,40 @@ public class PlayerManager : MonoBehaviour
             nextPlayer();
         }
     }
-
+    
     public IEnumerator potentialPlayerMovement(Player player, Location loc){
         if (player.getLocation().getResearchStationStatus() && loc.getResearchStationStatus()){
             Debug.Log("shuttle flight");
-            player.getLocation().playerLeaves(player);
+            playerLeavesLocation(player);
             player.shuttleFlightAction(loc);
-            loc.playerEnters(player);
+            playerEntersLocation(player, loc);
         }
         else if (player.isDriveFerryValid(loc)){
             Debug.Log("drive/ferry");
-            player.getLocation().playerLeaves(player);
+            playerLeavesLocation(player);
             player.driveFerryAction(loc);
-            loc.playerEnters(player);
+            playerEntersLocation(player, loc);
         }
         else {
             Location curLoc = player.getLocation();
             yield return StartCoroutine(player.otherMovement(loc, (movementCompleted) =>{
                 if (movementCompleted){
-                    curLoc.playerLeaves(player);
+                    playerLeavesLocation(player);
                     playerUI.updateHand(player, player.getHand());
-                    loc.playerEnters(player);
+                    playerEntersLocation(player, loc);
                 }
             }));
         }
+    }
+
+    public void playerLeavesLocation(Player player){
+        player.getLocation().playerLeaves(player);
+        player.leaveLocation();
+    }
+
+    public void playerEntersLocation(Player player, Location dest){
+        dest.playerEnters(player);
+        player.enterLocation(dest);
         placePawn(player);
     }
 
@@ -176,6 +196,10 @@ public class PlayerManager : MonoBehaviour
 
     public Player getCurPlayer(){
         return curPlayer;
+    }
+
+    public List<Player> getPlayers(){
+        return activePlayerScripts;
     }
 
     public Player playerPerformingAction(){
@@ -206,14 +230,24 @@ public class PlayerManager : MonoBehaviour
     }
 
     public IEnumerator requestUserSelectCard(List<PlayerCard> cardsToSelectFrom, List<PlayerCard> selectedCards, int numberToSelect, Nullable<Vals.Colour> colourToSelect){
-        yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(cardsToSelectFrom, selectedCards, numberToSelect, colourToSelect));
+        yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(cardsToSelectFrom, selectedCards, Vals.SELECTABLE_PLAYER_CARD, numberToSelect, colourToSelect));
     }
 
     public void updateHand(Player player){
         playerUI.updateHand(player, player.getHand());
     }
 
-    public void setOtherPlayerInInteraction(Player player){
-        curPlayer.setOtherPlayerInInteraction(player);
+    public void setUserSelectedPlayer(Player player){
+        userSelectedPlayer = player;
+    }
+
+    public Player getUserSelectedPlayer(){
+        return userSelectedPlayer;
+    }
+
+    public void airlift(Location dest){
+        playerLeavesLocation(userSelectedPlayer);
+        playerEntersLocation(userSelectedPlayer, dest);
+        userSelectedPlayer.setCurLoc(dest);
     }
 }

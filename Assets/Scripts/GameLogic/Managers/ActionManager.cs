@@ -17,14 +17,30 @@ public class ActionManager : MonoBehaviour
     public event TreatEventHandler treatActionClicked;
     
     public void handleLocClick(Location loc){
-        if (gameFlowManager.getPhase() == Vals.Phase.ACTION && playerManager.actionAvailable()){
+
+        if (Vals.removeResearchStation){
+            if(loc.getResearchStationStatus()){
+                loc.removeResearchStation();
+                Vals.removeResearchStation = false;
+            }   
+        }
+        else if (Vals.cardResolving == Vals.AIRLIFT){
+            playerManager.airlift(loc);
+            Vals.cardResolving = -1;
+        }
+        else if(Vals.cardResolving == Vals.GOVERNMENT_GRANT){
+            if (!loc.getResearchStationStatus()){
+                board.buildResearchStation(loc);
+                Vals.cardResolving = -1;
+            }
+        }
+        else if (gameFlowManager.getPhase() == Vals.Phase.ACTION && playerManager.actionAvailable()){
             Debug.Log(loc.getName() + " clicked");
             Player player = playerManager.getCurPlayer();
             if (player.getLocation().Equals(loc)){
                StartCoroutine(handleTreatAction(player, loc)); 
             }
             else {
-                Debug.Log("not here");
                 StartCoroutine(playerManager.potentialPlayerMovement(player, loc));
             }
         }
@@ -41,7 +57,6 @@ public class ActionManager : MonoBehaviour
                 colourToTreat = activeDiseases[0];
                 break;
             default:
-                Debug.Log("multiple diseases here - select please");
                 string message = "Select disease to treat";
                 yield return StartCoroutine(overlayUI.requestSimpleSelectionFromPlayer(activeDiseases, Vals.SELECTABLE_DISEASE, message));
                 colourToTreat = playerSelectedCube;
@@ -69,7 +84,7 @@ public class ActionManager : MonoBehaviour
                     break;
                 case "BuildAction":
                     Debug.Log("Build");
-                    actionTaker.buildAction();
+                    yield return StartCoroutine(actionTaker.buildAction());
                     playerUI.updateHand(actionTaker, actionTaker.getHand());
                     break;
                 case "CureAction":
@@ -88,7 +103,7 @@ public class ActionManager : MonoBehaviour
         yield break;
     }
 
-    public void handlePresentedPlayerCardClick (bool selected, PlayerCard card){
+    public void handlePresentedCardClick (bool selected, Card card){
         if(selected){
             overlayUI.adjustDiscardRequiredCount(1, card);
         }

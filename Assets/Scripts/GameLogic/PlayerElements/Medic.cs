@@ -12,4 +12,8 @@ public class Medic : Role
     public override bool treatAction(){
         return true;
     }
+
+    public override void enterLocation(){
+
+    }
 }

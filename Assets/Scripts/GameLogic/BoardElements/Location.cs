@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Location : MonoBehaviour, IPointerClickHandler 
+public class Location : MonoBehaviour
 {
     public ActionManager actionManager;
     public Vals.Colour colour;
@@ -12,11 +12,6 @@ public class Location : MonoBehaviour, IPointerClickHandler
     private List<Player> localPlayers = new List<Player>();
 
     private bool researchStation = false;
-
-    public void OnPointerClick(PointerEventData data) {
-         // This will only execute if the objects collider was the first hit by the click's raycast
-         
-     }
 
     public void OnMouseDown(){
         actionManager.handleLocClick(this);
@@ -61,6 +56,10 @@ public class Location : MonoBehaviour, IPointerClickHandler
     public void buildResearchStation(){
         researchStation = true;
         Debug.Log("Building research station" + gameObject.name);
+    }
+
+    public void removeResearchStation(){
+        researchStation = false;
     }
 
     public bool getResearchStationStatus(){

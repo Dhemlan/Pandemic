@@ -39,6 +39,7 @@ public class Vals
     
     public const int DEFAULT_HAND_LIMIT = 7;
     public const int DEFAULT_CARDS_TO_CURE = 3;
+    public const int DEFAULT_RESEARCH_STATION_SUPPLY = 6;
 
     // Misc numbers
     public const int OUTBREAK_THRESHOLD = 3;
@@ -50,8 +51,12 @@ public class Vals
     
     // Code-related values
     public static bool proceed = false;
+    public static bool oneQuietNightActive = false;
+    public static bool removeResearchStation = false;
+    public static int cardResolving = -1;
     public const int MAX_HAND_SIZE = 8;
     public const float GENERIC_WAIT_TIME = 0.75f;
+    
 
     public const int SELECTABLE_PLAYER_CARD = 0;
     public const int PLAYER_CARD = 1;
@@ -59,6 +64,7 @@ public class Vals
     public const int INFECTION_CARD = 3;
     public const int SELECTABLE_DISEASE = 4;
     public const int SELECTABLE_PLAYER = 5;
+    public const int EVENT_CARD = 6;
 
     public const string GAME_OVER_OUTBREAKS = "Frequent outbreaks have made the disease uncontainable\nGame Over";
     public const string GAME_OVER_CUBES = "One of the diseases has taken over\nGame Over";

@@ -31,8 +31,14 @@ public class GameFlowManager : MonoBehaviour
             yield return StartCoroutine(playerManager.movePhase());
             phase = Vals.Phase.DRAW;
             yield return StartCoroutine(board.drawPhase());
-            phase = Vals.Phase.INFECTION;
-            yield return StartCoroutine(board.infectionPhase());
+            if (!Vals.oneQuietNightActive){
+                phase = Vals.Phase.INFECTION;
+                yield return StartCoroutine(board.infectionPhase());
+            }
+            else {
+                Vals.oneQuietNightActive = false;
+            }
+            playerManager.endPlayerTurn();
         }
         yield break;
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InteractableCard : MonoBehaviour, ISelectable<PlayerCard>
+public class InteractablePlayerCard : MonoBehaviour, ISelectable<PlayerCard>
 {
     private PlayerCard card;
     public GameObject selectedIcon;
@@ -17,7 +17,7 @@ public class InteractableCard : MonoBehaviour, ISelectable<PlayerCard>
 
     public void OnMouseDown(){
         selectedIcon.SetActive(!selectedIcon.activeSelf);
-        actionManager.handlePresentedPlayerCardClick(selectedIcon.activeSelf, card);
+        actionManager.handlePresentedCardClick(selectedIcon.activeSelf, card);
     }
     
     public void populateItemData(PlayerCard card){

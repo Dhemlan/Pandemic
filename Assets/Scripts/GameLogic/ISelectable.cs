@@ -10,4 +10,8 @@ public interface ISelectable<T>
 
     Sprite getSprite();
 
+    bool isSelected();
+
+    T getSelectedValue();
+
 }

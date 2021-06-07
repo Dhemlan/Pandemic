@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InteractableInfectionCard : MonoBehaviour, ISelectable<InfectionCard>
+public class SelectableInfectionCard : MonoBehaviour, ISelectable<InfectionCard>
 {
     private InfectionCard card;
-    private SpriteRenderer spriteRen;
     public GameObject selectedIcon;
     public Text label;
     private ActionManager actionManager;
@@ -17,8 +16,10 @@ public class InteractableInfectionCard : MonoBehaviour, ISelectable<InfectionCar
     }
 
     public void OnMouseDown(){
-        //selectedIcon.SetActive(!selectedIcon.activeSelf);
-       // actionManager.handlePresentedPlayerCardClick(selectedIcon.activeSelf, card);
+        selectedIcon.SetActive(!selectedIcon.activeSelf);
+        Debug.Log("card clicked");
+        actionManager.handlePresentedCardClick(selectedIcon.activeSelf, card);
+        GameObject.Find("EventCardHandler").GetComponent<EventCardHandler>().infectionCardClicked(selectedIcon.activeSelf, card);   
     }
     
     public void populateItemData(InfectionCard card){

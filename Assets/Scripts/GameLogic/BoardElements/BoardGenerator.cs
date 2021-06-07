@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BoardGenerator 
+public class BoardGenerator : MonoBehaviour
 {
     private Location[] locations;
     private int epidemicCardCount;
 
     public PlayerManager playerManager;
     
-    public BoardGenerator(Stack<InfectionCard> infectionDeck, Stack<InfectionCard> epidemicInfectionCards, int epidemicCardCount){
+    public void generateBoard(Stack<InfectionCard> infectionDeck, Stack<InfectionCard> epidemicInfectionCards, int epidemicCardCount){
         this.epidemicCardCount = epidemicCardCount;
         setUpLocations();
-        buildInitialResearchStations();
         createInfectionDeck(infectionDeck, epidemicInfectionCards);
     }
 
@@ -31,9 +30,13 @@ public class BoardGenerator
             epidemicInfectionCards.Push(infectionDeck.Pop());
         }
     }
-    private void buildInitialResearchStations(){
-        locations[Vals.ATLANTA].buildResearchStation();
-        locations[Vals.BANGKOK].buildResearchStation();
+    public IEnumerator buildInitialResearchStations(Board board){
+
+        yield return StartCoroutine(board.buildResearchStation(locations[Vals.ATLANTA]));
+        yield return StartCoroutine(board.buildResearchStation(locations[Vals.BANGKOK]));
+        yield return StartCoroutine(board.buildResearchStation(locations[Vals.LIMA]));
+        yield return StartCoroutine(board.buildResearchStation(locations[Vals.SYDNEY]));
+        yield return StartCoroutine(board.buildResearchStation(locations[Vals.PARIS]));
     }
 
     public void preparePlayerCards(Stack<PlayerCard> playerDeck, PlayerManager playerManager, List<PlayerCard> eventCards){

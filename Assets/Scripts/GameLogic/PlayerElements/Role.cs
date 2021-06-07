@@ -9,7 +9,7 @@ public class Role
     protected int id;
     protected string name;
     protected bool usedThisRound = false;
-    public PlayerManager playerManager;
+    protected PlayerManager playerManager;
 
     public int getCardsToCure(){
         return cardsToCure;
@@ -59,5 +59,9 @@ public class Role
 
     public virtual bool nonStandardMove(Player player, Location loc){
         return false;
+    }
+
+    public virtual void enterLocation(){
+
     }
 }

@@ -10,9 +10,8 @@ public class SelectablePlayer : MonoBehaviour, ISelectable<Player>
     public Text label;
     public Sprite[] sprites;
 
-    public void OnMouseDown(){
-        Debug.Log("Selectable player clicked");   
-        GameObject.Find("PlayerManager").GetComponent<PlayerManager>().setOtherPlayerInInteraction(player);
+    public void OnMouseDown(){  
+        GameObject.Find("PlayerManager").GetComponent<PlayerManager>().setUserSelectedPlayer(player);
         Vals.proceed = true;
     }
 
@@ -23,6 +22,14 @@ public class SelectablePlayer : MonoBehaviour, ISelectable<Player>
 
    public Sprite getSprite(){
        return sprites[player.getRole().getID()];
+   }
+
+   public bool isSelected(){
+       return false;
+   }
+
+      public Player getSelectedValue(){
+       return player;
    }
 
 }

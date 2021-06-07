@@ -20,4 +20,13 @@ public class SelectableCube : MonoBehaviour, ISelectable<Vals.Colour>
         return sprites[(int) colour];
     }
 
+    public bool isSelected(){
+       return false;
+    }
+
+    public Vals.Colour getSelectedValue(){
+       return colour;
+    }
 }
+
+
