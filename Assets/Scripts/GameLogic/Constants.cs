@@ -38,7 +38,7 @@ public class Vals
     public static int[] INFECTION_RATE_TRACK = {2,2,2,3,3,4,4};
     
     public const int DEFAULT_HAND_LIMIT = 7;
-    public const int DEFAULT_CARDS_TO_CURE = 3;
+    public const int DEFAULT_CARDS_TO_CURE = 5;
     public const int DEFAULT_RESEARCH_STATION_SUPPLY = 6;
 
     // Misc numbers

@@ -18,14 +18,6 @@ public class Role
     public bool getResearchStationRequiredToCure(){
         return researchStationRequiredToCure;
     }
-
-    public int getID(){
-        return id;
-    }
-
-    public string getName(){
-        return name;
-    }
     
     public virtual bool buildAction(Player player){
         Debug.Log("default build");
@@ -63,5 +55,18 @@ public class Role
 
     public virtual void enterLocation(){
 
+    }
+
+    public virtual IEnumerator characterAction<T>(T itemToActOn){
+        Debug.Log(id + "character action");
+        yield break;
+    } 
+
+    public int getID(){
+        return id;
+    }
+
+    public string getName(){
+        return name;
     }
 }

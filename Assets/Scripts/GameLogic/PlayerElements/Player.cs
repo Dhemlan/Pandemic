@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     private Location curLoc;
     public Location startingLoc;
     public List<PlayerCard> hand = new List<PlayerCard>();
-    private int handLimit = 4;//Vals.DEFAULT_HAND_LIMIT;
+    private int handLimit = Vals.DEFAULT_HAND_LIMIT;
     private int maxActions = 4;
 
     private PlayerCard cardToTrade;

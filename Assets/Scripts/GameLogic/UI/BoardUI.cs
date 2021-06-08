@@ -78,4 +78,9 @@ public class BoardUI : MonoBehaviour
         cureTokens[(int)colour].GetComponent<SpriteRenderer>().sprite = eradicatedSprites[(int)colour];
     }
 
+    public void toggleResearchStation(Location loc){
+        SpriteRenderer station = loc.transform.Find("ResearchStation").GetComponent<SpriteRenderer>();
+        station.enabled = !station.enabled;
+    }
+
 }

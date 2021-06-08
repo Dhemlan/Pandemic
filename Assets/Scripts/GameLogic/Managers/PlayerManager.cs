@@ -99,13 +99,15 @@ public class PlayerManager : MonoBehaviour
         playerUI.updateHand(player, player.getHand());
     }
 
-    public void removeCardFromHand(PlayerCard card, bool toDiscard){
+    public bool removeCardFromHand(PlayerCard card, bool toDiscard){
         foreach (Player player in activePlayerScripts){
             if(player.hasCard(card)){
                 removeCardFromHand(player, card, toDiscard);
                 Debug.Log("Discarding " + card.getName() + player);
+                return true;
             }
         }
+        return false;
     }
 
     public IEnumerator checkHandLimit(Player player){
@@ -249,5 +251,14 @@ public class PlayerManager : MonoBehaviour
         playerLeavesLocation(userSelectedPlayer);
         playerEntersLocation(userSelectedPlayer, dest);
         userSelectedPlayer.setCurLoc(dest);
+    }
+
+    public void storedEventCardPlayed(){
+        foreach(Player player in activePlayerScripts){
+            if (player.getRoleID() == Vals.CONTINGENCY_PLANNER){
+                ContingencyPlanner planner = (ContingencyPlanner) player.getRole();
+                planner.storedEventCardPlayed();
+            }
+        }    
     }
 }

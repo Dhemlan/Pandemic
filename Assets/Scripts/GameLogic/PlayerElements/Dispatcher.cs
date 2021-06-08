@@ -16,4 +16,9 @@ public class Dispatcher : Role
         }
         return false;
     }
+
+    public override IEnumerator characterAction<T>(T playerToMove){
+        Debug.Log("Dispatcher");
+        yield break;
+    }
 }

@@ -32,10 +32,9 @@ public class Board : MonoBehaviour
 
     public IEnumerator boardSetUp(int epidemicCardCount){
         BoardGenerator generator = gameObject.GetComponent<BoardGenerator>();
-        generator.generateBoard(infectionDeck, epidemicInfectionCards, epidemicCardCount);
-        yield return StartCoroutine(generator.buildInitialResearchStations(this));
-        //yield return StartCoroutine(infectCities());
-        playerManager.generateCharacters(4);
+        yield return StartCoroutine(generator.generateBoard(this, infectionDeck, epidemicInfectionCards, epidemicCardCount));
+        yield return StartCoroutine(infectCities());
+        playerManager.generateCharacters(3);
         generator.preparePlayerCards(playerDeck, playerManager, availableEventCards);
         boardUI.boardSetUp(playerDeck.Count);
         overlayUI.gatherColliders(GetComponentsInChildren<CircleCollider2D>(), GetComponentsInChildren<BoxCollider2D>());
@@ -60,7 +59,6 @@ public class Board : MonoBehaviour
                     // Increase Step
                     infectionRateTrackIndex++;
                     boardUI.advanceInfectionRateTrack();
-
                     // Infect Step
                     InfectionCard epidemicDrawn = epidemicInfectionCards.Pop();
                     Location loc = epidemicDrawn.getLocation();
@@ -72,7 +70,6 @@ public class Board : MonoBehaviour
                         }
                     }
                     outbreakCitiesThisMove.Clear();
-
                     //Intensify Step
                     Utils.ShuffleAndPlaceOnTop(infectionDiscardPile, infectionDeck);
                 }
@@ -231,11 +228,12 @@ public class Board : MonoBehaviour
             Debug.Log("Remove a station");
             Vals.removeResearchStation = true;
             yield return new WaitUntil(() => !Vals.removeResearchStation);  
-            // wait until location selected
+            //boardUI.toggleResearchStation()
             researchStationSupply++;
 
         }
         loc.buildResearchStation();
+        boardUI.toggleResearchStation(loc);
         researchStationSupply--;
         Debug.Log("research stations in supply "  + researchStationSupply);
         boardUI.buildResearchStation();
@@ -246,12 +244,18 @@ public class Board : MonoBehaviour
         boardUI.activateDrawButton();
     }
 
+    public void eventCardDrawn(PlayerCard card){
+        availableEventCards.Add(card);
+    }
+
     public void eventCardPlayed(PlayerCard eventCard){
         availableEventCards.Remove(eventCard);
         if (!eventCard.getRemoveAfterPlaying()){
             playerDiscardPile.Add(eventCard);
         }
-        playerManager.removeCardFromHand(eventCard, false);
+        if(!playerManager.removeCardFromHand(eventCard, false)){
+            playerManager.storedEventCardPlayed();
+        };
     }
 
     private void eradicateDisease(Vals.Colour colour){
@@ -268,12 +272,26 @@ public class Board : MonoBehaviour
         gameFlowManager.gameOver(Vals.GAME_OVER_CURES);
     }
 
-    public void removeInfectionCardFromGame(InfectionCard toRemove){
+    public void removeInfectionCardFromDiscard(InfectionCard toRemove){
         infectionDiscardPile.Remove(toRemove);
     }
 
     public List<InfectionCard> getInfectionDiscardPile(){
         return infectionDiscardPile;
+    }
+
+    public List<PlayerCard> getEventsInDiscard(){
+        List<PlayerCard> playerCards = new List<PlayerCard>();
+        foreach(PlayerCard card in playerDiscardPile){
+            if (card.getColour() == Vals.Colour.EVENT){
+                playerCards.Add(card);
+            }
+        }
+        return playerCards;
+    }
+
+    public void removePlayerCardFromDiscard(PlayerCard toRemove){
+        playerDiscardPile.Remove(toRemove);
     }
 
     public Stack<InfectionCard> getInfectionDeck(){

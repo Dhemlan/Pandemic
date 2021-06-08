@@ -9,9 +9,10 @@ public class BoardGenerator : MonoBehaviour
 
     public PlayerManager playerManager;
     
-    public void generateBoard(Stack<InfectionCard> infectionDeck, Stack<InfectionCard> epidemicInfectionCards, int epidemicCardCount){
+    public IEnumerator generateBoard(Board board, Stack<InfectionCard> infectionDeck, Stack<InfectionCard> epidemicInfectionCards, int epidemicCardCount){
         this.epidemicCardCount = epidemicCardCount;
         setUpLocations();
+        yield return StartCoroutine(buildInitialResearchStations(board));
         createInfectionDeck(infectionDeck, epidemicInfectionCards);
     }
 
@@ -31,12 +32,12 @@ public class BoardGenerator : MonoBehaviour
         }
     }
     public IEnumerator buildInitialResearchStations(Board board){
-
         yield return StartCoroutine(board.buildResearchStation(locations[Vals.ATLANTA]));
         yield return StartCoroutine(board.buildResearchStation(locations[Vals.BANGKOK]));
+        /*yield return StartCoroutine(board.buildResearchStation(locations[Vals.SYDNEY]));
         yield return StartCoroutine(board.buildResearchStation(locations[Vals.LIMA]));
-        yield return StartCoroutine(board.buildResearchStation(locations[Vals.SYDNEY]));
         yield return StartCoroutine(board.buildResearchStation(locations[Vals.PARIS]));
+        yield return StartCoroutine(board.buildResearchStation(locations[Vals.ESSEN]));*/
     }
 
     public void preparePlayerCards(Stack<PlayerCard> playerDeck, PlayerManager playerManager, List<PlayerCard> eventCards){

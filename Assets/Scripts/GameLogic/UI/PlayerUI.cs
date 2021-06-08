@@ -26,7 +26,11 @@ public class PlayerUI : MonoBehaviour
             
             // Assign sprites
             int role = player.GetComponent<Player>().getRoleID();
-            player.transform.Find("Pawn").GetComponent<SpriteRenderer>().sprite = pawnSprites[role];
+            Transform pawn = player.transform.Find("Pawn");
+            pawn.GetComponent<SpriteRenderer>().sprite = pawnSprites[role];
+            if (role == Vals.DISPATCHER || role == Vals.CONTINGENCY_PLANNER){
+                pawn.transform.Find("CharacterAction").gameObject.SetActive(true);
+            }
             player.transform.Find("PlayerName").GetComponent<Text>().text = Vals.ROLES[role];
             pawns[i].GetComponent<SpriteRenderer>().sprite = pawnSprites[role];
             i++;

@@ -10,17 +10,19 @@ public class ActionManager : MonoBehaviour
     public PlayerUI playerUI;
     public Board board;
     public OverlayUI overlayUI;
+    public BoardUI boardUI;
 
     private Vals.Colour playerSelectedCube;
 
     public delegate void TreatEventHandler();
     public event TreatEventHandler treatActionClicked;
     
-    public void handleLocClick(Location loc){
+    public IEnumerator handleLocClick(Location loc){
 
         if (Vals.removeResearchStation){
             if(loc.getResearchStationStatus()){
                 loc.removeResearchStation();
+                boardUI.toggleResearchStation(loc);
                 Vals.removeResearchStation = false;
             }   
         }
@@ -30,7 +32,7 @@ public class ActionManager : MonoBehaviour
         }
         else if(Vals.cardResolving == Vals.GOVERNMENT_GRANT){
             if (!loc.getResearchStationStatus()){
-                board.buildResearchStation(loc);
+                yield return StartCoroutine(board.buildResearchStation(loc));
                 Vals.cardResolving = -1;
             }
         }
@@ -44,6 +46,7 @@ public class ActionManager : MonoBehaviour
                 StartCoroutine(playerManager.potentialPlayerMovement(player, loc));
             }
         }
+        yield break;
     }
 
     public IEnumerator handleTreatAction(Player player, Location loc){
@@ -100,6 +103,37 @@ public class ActionManager : MonoBehaviour
                     break;
             }
         }
+        yield break;
+    }
+
+    public IEnumerator handleCharacterActionClick(Player player){
+        if (playerManager.getCurPlayer() == player){
+            switch (player.getRoleID()){
+                case Vals.CONTINGENCY_PLANNER:
+                ContingencyPlanner role = (ContingencyPlanner) player.getRole();
+                    if (role.eventCardStored()){
+                        Debug.Log("already storing card");
+                        yield break;
+                    }
+                    List<PlayerCard> selected = new List<PlayerCard>();
+                    List<PlayerCard> discardedEvents = board.getEventsInDiscard();
+                    if (discardedEvents.Count == 0){
+                        Debug.Log("no events available");
+                        yield break;
+                    }
+                    yield return StartCoroutine(playerManager.requestUserSelectCard(discardedEvents, selected, 1, null));
+                    PlayerCard selectedEvent = selected[0];
+                    board.removePlayerCardFromDiscard(selectedEvent);
+                    board.eventCardDrawn(selectedEvent);
+                    yield return StartCoroutine(role.characterAction(selectedEvent));
+                    break;
+
+                case Vals.DISPATCHER:
+                    break;
+            }
+            playerManager.incrementCompletedActions();
+        }
+
         yield break;
     }
 

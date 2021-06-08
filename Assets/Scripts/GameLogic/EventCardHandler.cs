@@ -19,6 +19,7 @@ public class EventCardHandler : MonoBehaviour
         overlayUI.deactivateInteractableOverlay();
         switch (card.getId()){
             case Vals.ONE_QUIET_NIGHT:
+                if(Vals.oneQuietNightActive) yield break;
                 Debug.Log("Playing One Quiet Night");
                 Vals.oneQuietNightActive = true;
                 break;
@@ -51,7 +52,7 @@ public class EventCardHandler : MonoBehaviour
         Debug.Log("res pop executing");
         List<InfectionCard> selected = new List<InfectionCard>();
         yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(board.getInfectionDiscardPile(), selected, Vals.SELECTABLE_INFECTION_CARD, 1, null));
-        board.removeInfectionCardFromGame(selected[0]);
+        board.removeInfectionCardFromDiscard(selected[0]);
     }
 
     private IEnumerator forecast(){

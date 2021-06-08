@@ -7,14 +7,14 @@ public class Location : MonoBehaviour
 {
     public ActionManager actionManager;
     public Vals.Colour colour;
-    int[] diseaseCubes = {0,0,0,1};
+    int[] diseaseCubes = {0,0,0,0};
     public List<Location> neighbours = new List<Location>();
     private List<Player> localPlayers = new List<Player>();
 
     private bool researchStation = false;
 
     public void OnMouseDown(){
-        actionManager.handleLocClick(this);
+        StartCoroutine(actionManager.handleLocClick(this));
     }
 
     public void addCube(Vals.Colour colour){  
