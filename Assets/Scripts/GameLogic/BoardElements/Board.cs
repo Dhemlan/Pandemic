@@ -33,7 +33,7 @@ public class Board : MonoBehaviour
     public IEnumerator boardSetUp(int epidemicCardCount){
         BoardGenerator generator = gameObject.GetComponent<BoardGenerator>();
         yield return StartCoroutine(generator.generateBoard(this, infectionDeck, epidemicInfectionCards, epidemicCardCount));
-        yield return StartCoroutine(infectCities());
+        //yield return StartCoroutine(infectCities());
         playerManager.generateCharacters(3);
         generator.preparePlayerCards(playerDeck, playerManager, availableEventCards);
         boardUI.boardSetUp(playerDeck.Count);

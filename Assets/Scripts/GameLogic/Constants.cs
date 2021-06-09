@@ -33,7 +33,7 @@ public class Vals
     public const int OUTBREAK_COUNT_LIMIT = 8;
     public const int INITIAL_INFECTION_ROUNDS = 3;
     public const int CARDS_PER_INITIAL_INFECTION_ROUND = 3; 
-    public const int INITIAL_DISEASE_CUBE_COUNT = 20;
+    public const int INITIAL_DISEASE_CUBE_COUNT = 24;
     public const int DISEASE_COUNT = 4;
     public static int[] INFECTION_RATE_TRACK = {2,2,2,3,3,4,4};
     
