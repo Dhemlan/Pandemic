@@ -8,7 +8,8 @@ public class BoardUI : MonoBehaviour
     public CardUI cardUI;
     
     public GameObject exampleLocation;
-    public GameObject[] cubePrefabs;
+    public GameObject diseaseCubePrefab;
+    public Sprite[] diseaseCubeSprites;
 
     public Text[] cubeReserveText;
     public Text outbreaksCounterText, playerDeckCountText;
@@ -35,23 +36,25 @@ public class BoardUI : MonoBehaviour
     }
 
     public IEnumerator addCube(Location loc, Vals.Colour colour){
-        GameObject diseaseCube = Instantiate(cubePrefabs[(int)colour], new Vector3(10,10,0), Quaternion.identity);
-        diseaseCube.transform.SetParent(loc.transform);
-        float width = exampleLocation.GetComponent<SpriteRenderer>().sprite.bounds.size.x *.35f;
+        GameObject diseaseCube = Instantiate(diseaseCubePrefab, new Vector3(10,10,0), Quaternion.identity, loc.transform);
+        SpriteRenderer renderer = diseaseCube.GetComponent<SpriteRenderer>();
+        renderer.sprite = diseaseCubeSprites[(int)colour];
+        renderer.sortingOrder = 4;
         
-        Transform[] cubes = loc.transform.GetComponentsInChildren<Transform>();
-        float space = 2 * width / cubes.Length;
-        float pos = space * (cubes.Length - 1) / 2f;
-        
-        for (int i = 1; i < cubes.Length; i++){
-            cubes[i].transform.position = new Vector3(loc.transform.position.x - pos, loc.transform.position.y - width, 0);
-            pos -= space;
+        DiseaseCubeRotator[] cubes = loc.transform.GetComponentsInChildren<DiseaseCubeRotator>();
+        int i = 0;
+        foreach (DiseaseCubeRotator cube in cubes){
+            float theta = (2 * Mathf.PI / cubes.Length) * i;
+            float bufferDistance = 1.9f;
+            cube.transform.position = new Vector3(loc.transform.position.x - bufferDistance * Mathf.Cos(theta), loc.transform.position.y - bufferDistance * Mathf.Sin(theta), 0);
+            i++;
+            cube.setSpeed(cubes.Length);
         }
         yield return new WaitForSeconds(.3f);
     }
 
     public void removeCube(Location loc, Vals.Colour colour){
-        Destroy(loc.transform.GetChild(0).gameObject);
+        Destroy(loc.transform.GetChild(1).gameObject);
     }
 
     public void increaseOutbreakCounter(int newCount){
@@ -64,10 +67,6 @@ public class BoardUI : MonoBehaviour
 
     public void activateDrawButton(){
         drawButton.gameObject.SetActive(true);
-    }
-
-    public void buildResearchStation(){
-        
     }
 
     public void diseaseCured(Vals.Colour colour){

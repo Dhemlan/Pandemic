@@ -107,7 +107,7 @@ public class ActionManager : MonoBehaviour
     }
 
     public IEnumerator handleCharacterActionClick(Player player){
-        if (playerManager.getCurPlayer() == player){
+        if (playerManager.getCurPlayer() == player && gameFlowManager.getPhase() == Vals.Phase.ACTION && playerManager.actionAvailable()){
             switch (player.getRoleID()){
                 case Vals.CONTINGENCY_PLANNER:
                 ContingencyPlanner role = (ContingencyPlanner) player.getRole();

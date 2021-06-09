@@ -2751,11 +2751,6 @@ MonoBehaviour:
   - {fileID: 3286163911610860551, guid: b36e201fff7c1b340b87e2cbcff9b5f3, type: 3}
   - {fileID: 3286163911610860551, guid: 2287a3e9d749100408654a9a491f2d09, type: 3}
   - {fileID: 0}
-  pawns:
-  - {fileID: 222461480}
-  - {fileID: 132084206}
-  - {fileID: 1980724507}
-  - {fileID: 1862181480}
   pawnSprites:
   - {fileID: 3286163911610860551, guid: a0344fc9da560eb4d970414a87f9d3b0, type: 3}
   - {fileID: 3286163911610860551, guid: e79ed27b02e7eb34d8603c418e791770, type: 3}
@@ -8705,11 +8700,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardUI: {fileID: 1253473105}
   exampleLocation: {fileID: 1897527282}
-  cubePrefabs:
-  - {fileID: 8783805712824926424, guid: 121708274d61b7f4690e120b0f454820, type: 3}
-  - {fileID: 8783805712824926424, guid: 4c022786e486db2429770569a6e5b04a, type: 3}
-  - {fileID: 8783805712824926424, guid: 7cafc9e73a1f78b459065a1fa1c61da9, type: 3}
-  - {fileID: 8783805712824926424, guid: 493d0944601c3054b906acdae9d8ea7c, type: 3}
+  diseaseCubePrefab: {fileID: 8783805712824926424, guid: 7cafc9e73a1f78b459065a1fa1c61da9,
+    type: 3}
+  diseaseCubeSprites:
+  - {fileID: 3286163911610860551, guid: 1d2873c1d502ac5459d66e5391321752, type: 3}
+  - {fileID: 3286163911610860551, guid: e7d8f8cb1af27e8498523d2a7b30ab45, type: 3}
+  - {fileID: 3286163911610860551, guid: 11a69372769d42746a9fee66cecd4b18, type: 3}
+  - {fileID: 3286163911610860551, guid: bd2587bac7fd42541aaef609b73395e4, type: 3}
   cubeReserveText:
   - {fileID: 1485151383}
   - {fileID: 1430012013}
@@ -14851,7 +14848,8 @@ MonoBehaviour:
   playerManager: {fileID: 109051348}
   turnOrderPos: 4
   startingLoc: {fileID: 1424507122}
-  board: {fileID: 0}
+  board: {fileID: 1220601655}
+  boardPawn: {fileID: 1626968261}
 --- !u!114 &767512138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16276,6 +16274,7 @@ MonoBehaviour:
   turnOrderPos: 3
   startingLoc: {fileID: 1424507122}
   board: {fileID: 1220601655}
+  boardPawn: {fileID: 1605874405}
 --- !u!114 &824870013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22252,6 +22251,12 @@ MonoBehaviour:
   src: {fileID: 769390490}
   dest: {fileID: 632875454}
   colour: {fileID: 2100000, guid: 0ce55cded5dc6b14b8a76c31e669e8a2, type: 2}
+--- !u!1 &1152294484 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8450251240969304123, guid: 696802ad511439343bd3380c24939cad,
+    type: 3}
+  m_PrefabInstance: {fileID: 183074947}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1152916230
 GameObject:
   m_ObjectHideFlags: 0
@@ -22521,6 +22526,12 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1185869277 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8450251240969304123, guid: 696802ad511439343bd3380c24939cad,
+    type: 3}
+  m_PrefabInstance: {fileID: 5611439884939836630}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1200680986
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30841,6 +30852,7 @@ MonoBehaviour:
   turnOrderPos: 2
   startingLoc: {fileID: 1424507122}
   board: {fileID: 1220601655}
+  boardPawn: {fileID: 1185869277}
 --- !u!114 &1587156249
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31255,6 +31267,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 938490601}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1605874405 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8450251240969304123, guid: 696802ad511439343bd3380c24939cad,
+    type: 3}
+  m_PrefabInstance: {fileID: 1628499767}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1617090439
 GameObject:
   m_ObjectHideFlags: 0
@@ -31479,6 +31497,12 @@ MonoBehaviour:
   src: {fileID: 1957195974}
   dest: {fileID: 413084416}
   colour: {fileID: 2100000, guid: 0ce55cded5dc6b14b8a76c31e669e8a2, type: 2}
+--- !u!1 &1626968261 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8450251240969304123, guid: 696802ad511439343bd3380c24939cad,
+    type: 3}
+  m_PrefabInstance: {fileID: 203841586}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1628499767
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42239,6 +42263,7 @@ MonoBehaviour:
   turnOrderPos: 1
   startingLoc: {fileID: 1424507122}
   board: {fileID: 1220601655}
+  boardPawn: {fileID: 1152294484}
 --- !u!114 &2132101224
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -34,7 +34,7 @@ public class Board : MonoBehaviour
         BoardGenerator generator = gameObject.GetComponent<BoardGenerator>();
         yield return StartCoroutine(generator.generateBoard(this, infectionDeck, epidemicInfectionCards, epidemicCardCount));
         //yield return StartCoroutine(infectCities());
-        playerManager.generateCharacters(3);
+        playerManager.generateCharacters(4);
         generator.preparePlayerCards(playerDeck, playerManager, availableEventCards);
         boardUI.boardSetUp(playerDeck.Count);
         overlayUI.gatherColliders(GetComponentsInChildren<CircleCollider2D>(), GetComponentsInChildren<BoxCollider2D>());
@@ -236,7 +236,6 @@ public class Board : MonoBehaviour
         boardUI.toggleResearchStation(loc);
         researchStationSupply--;
         Debug.Log("research stations in supply "  + researchStationSupply);
-        boardUI.buildResearchStation();
         yield break;
     }
 

@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
 
     private PlayerCard cardToTrade;
     public Board board;
+    public GameObject boardPawn;
 
     public void Awake(){
         curLoc = startingLoc;
@@ -50,7 +51,7 @@ public class Player : MonoBehaviour
     }
 
     public void shuttleFlightAction(Location dest){
-        moveCompleted(dest);
+        moveCompleted();
     }
 
     public bool isDriveFerryValid(Location dest){
@@ -58,7 +59,7 @@ public class Player : MonoBehaviour
     }
 
     public void driveFerryAction(Location dest){
-        moveCompleted(dest);
+        moveCompleted();
     }
 
     public void commercialFlightAction(PlayerCard cardToDiscard, Location dest){
@@ -73,11 +74,10 @@ public class Player : MonoBehaviour
 
     public void moveRequiringDiscard(PlayerCard cardToDiscard, Location dest){
         playerManager.removeCardFromHand(this, cardToDiscard, true);
-        moveCompleted(dest);
+        moveCompleted();
     }
 
-    public void moveCompleted(Location dest){
-        curLoc = dest;
+    public void moveCompleted(){
         playerManager.incrementCompletedActions();
     }
 
@@ -88,7 +88,7 @@ public class Player : MonoBehaviour
                 yield return StartCoroutine(playerManager.requestUserSelectCard(hand, selectedCard, 1, null));
                 playerManager.removeCardFromHand(this, selectedCard[0], true);
             }
-            moveCompleted(dest);
+            moveCompleted();
             callback(true);
             yield break;
         }
@@ -108,7 +108,7 @@ public class Player : MonoBehaviour
             else{
                 commercialFlightAction(clickedLocCard, dest);
             }
-            moveCompleted(dest);
+            moveCompleted();
             callback(true);
             yield break;
         }
@@ -258,7 +258,7 @@ public class Player : MonoBehaviour
     }
 
     public void enterLocation(Location dest){
-
+        curLoc = dest;
     }
 
     public void resetOncePerTurnActions(){
@@ -299,5 +299,9 @@ public class Player : MonoBehaviour
 
     public int getRoleID(){
         return role.getID();
+    }
+
+    public GameObject getBoardPawn(){
+        return boardPawn;
     }
 }

@@ -30,17 +30,14 @@ public class PlayerManager : MonoBehaviour
         for (int i = 0; i < count; i++){
             Player newPlayer = allPlayerObjects[i].GetComponent<Player>();
             activePlayerScripts.Add(newPlayer);
-            //newPlayer.getLocation().playerEnters(newPlayer);
             activePlayerObjects.Add(allPlayerObjects[i]);
             activePlayerScripts[i].setRole(provideRandomRole());
         }
         curPlayer = activePlayerScripts[0];
 
         playerUI.preparePlayerUIObjects(activePlayerObjects);
-        int j = 0;
         foreach(Player player in activePlayerScripts){
-            playerUI.placePawn(j, player.getLocation());
-            j++;
+            playerUI.placePawn(player);
         }
     }
 
@@ -167,6 +164,7 @@ public class PlayerManager : MonoBehaviour
 
     public void playerLeavesLocation(Player player){
         player.getLocation().playerLeaves(player);
+        playerUI.updatePawns(player.getLocation());
         player.leaveLocation();
     }
 
@@ -208,22 +206,13 @@ public class PlayerManager : MonoBehaviour
         return curPlayer;
     }
     public void placePawn(Player player){
-        playerUI.placePawn(player.getTurnOrderPos() - 1, player.getLocation());
+        playerUI.placePawn(player);
+        playerUI.updatePawns(player.getLocation());
     }
 
     public void endActionPhase(){
         completedActions = maxActions;
         proceedSwitch = true;
-    }
-
-    public List<Player> getLocalPlayers(Location loc){
-        List<Player> localPlayers = new List<Player>();
-        foreach (Player player in activePlayerScripts){
-            if (player.getLocation().Equals(loc)){
-                localPlayers.Add(player);
-            }
-        }
-        return localPlayers;
     }
 
     public IEnumerator requestUserSelectPlayerToInteract(List<Player> players, string message){
@@ -249,8 +238,9 @@ public class PlayerManager : MonoBehaviour
 
     public void airlift(Location dest){
         playerLeavesLocation(userSelectedPlayer);
-        playerEntersLocation(userSelectedPlayer, dest);
         userSelectedPlayer.setCurLoc(dest);
+        playerEntersLocation(userSelectedPlayer, dest);
+        
     }
 
     public void storedEventCardPlayed(){
