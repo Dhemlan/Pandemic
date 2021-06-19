@@ -5,13 +5,19 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
   - enabled: 1
-    path: Assets/Scenes/GameInProgressScene.unity
-    guid: 5eba747f229fa21409aa8f26773e0d7e
+    path: Assets/Scenes/GameInProgressScene1.unity
+    guid: 6f77bf14aad645e4195011a916eace77
   - enabled: 1
-    path: Assets/Scenes/GameOver.unity
-    guid: 2f60ed9986733e145a7ad5b7f2a17395
+    path: Assets/Scenes/GameOverCards.unity
+    guid: 7c5e7d278adadaf4a81fa465cb2a23b5
+  - enabled: 1
+    path: Assets/Scenes/GameOverWin.unity
+    guid: 1af9d56e537445846b9ab1857ec844ad
+  - enabled: 1
+    path: Assets/Scenes/GameOverOutbreaks.unity
+    guid: 1cd01dda5734d1c4a8087898dee5923b
+  - enabled: 1
+    path: Assets/Scenes/GameOverCubes.unity
+    guid: b231420bff7fcdd4dabe86b73c38b342
   m_configObjects: {}
