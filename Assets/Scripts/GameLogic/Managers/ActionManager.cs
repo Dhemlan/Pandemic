@@ -29,17 +29,22 @@ public class ActionManager : MonoBehaviour
         else if (Vals.cardResolving == Vals.AIRLIFT){
             playerManager.airlift(loc);
             Vals.cardResolving = -1;
+            Vals.continueGameFlow = true;
         }
         else if(Vals.cardResolving == Vals.GOVERNMENT_GRANT){
             if (!loc.getResearchStationStatus()){
                 yield return StartCoroutine(board.buildResearchStation(loc));
                 Vals.cardResolving = -1;
+                Vals.continueGameFlow = true;
             }
         }
         else if (gameFlowManager.getPhase() == Vals.Phase.ACTION && playerManager.actionAvailable()){
             Debug.Log(loc.getName() + " clicked");
             Player player = playerManager.getCurPlayer();
-            if (player.getLocation().Equals(loc)){
+            if (player.getRoleID() == Vals.DISPATCHER && playerManager.getUserSelectedPlayer() != null){
+                StartCoroutine(playerManager.potentialPlayerMovement(player, loc));
+            }
+            else if (player.getLocation().Equals(loc)){
                StartCoroutine(handleTreatAction(player, loc)); 
             }
             else {
@@ -112,13 +117,13 @@ public class ActionManager : MonoBehaviour
                 case Vals.CONTINGENCY_PLANNER:
                 ContingencyPlanner role = (ContingencyPlanner) player.getRole();
                     if (role.eventCardStored()){
-                        Debug.Log("already storing card");
+                        StartCoroutine(overlayUI.displayToast(Strings.EVENT_STORED_ALREADY, true));
                         yield break;
                     }
                     List<PlayerCard> selected = new List<PlayerCard>();
                     List<PlayerCard> discardedEvents = board.getEventsInDiscard();
                     if (discardedEvents.Count == 0){
-                        Debug.Log("no events available");
+                        StartCoroutine(overlayUI.displayToast(Strings.NO_EVENTS_IN_DISCARD, true));
                         yield break;
                     }
                     yield return StartCoroutine(playerManager.requestUserSelectCard(discardedEvents, selected, 1, null));
@@ -126,12 +131,15 @@ public class ActionManager : MonoBehaviour
                     board.removePlayerCardFromDiscard(selectedEvent);
                     board.eventCardDrawn(selectedEvent);
                     yield return StartCoroutine(role.characterAction(selectedEvent));
+
+                    playerManager.incrementCompletedActions();
                     break;
 
                 case Vals.DISPATCHER:
+                    string message = Strings.SELECT_PLAYER_MOVE;
+                    yield return StartCoroutine(playerManager.requestUserSelectPlayerToInteract(playerManager.nonCurrentPlayers(), message));
                     break;
             }
-            playerManager.incrementCompletedActions();
         }
 
         yield break;

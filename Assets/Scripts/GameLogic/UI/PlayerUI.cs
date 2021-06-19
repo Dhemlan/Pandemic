@@ -10,6 +10,8 @@ public class PlayerUI : MonoBehaviour
 
     public Sprite[] diseaseIconSprites;
     public Sprite[] pawnSprites;
+    public Sprite[] actionIconSprites;
+    public Text actionsCountText;
 
     public void preparePlayerUIObjects(List<GameObject> players){
         foreach (GameObject player in players){
@@ -25,7 +27,10 @@ public class PlayerUI : MonoBehaviour
             Transform pawn = player.transform.Find("Pawn");
             pawn.GetComponent<SpriteRenderer>().sprite = pawnSprites[role];
             if (role == Vals.DISPATCHER || role == Vals.CONTINGENCY_PLANNER){
-                pawn.transform.Find("CharacterAction").gameObject.SetActive(true);
+                GameObject actionIcon = pawn.transform.Find("CharacterAction").gameObject;
+                actionIcon.SetActive(true);
+                actionIcon.GetComponent<SpriteRenderer>().sprite = actionIconSprites[role];
+                actionIcon.GetComponentInChildren<Text>().text = Vals.actionIconLabels[role];
             }
             player.transform.Find("PlayerName").GetComponent<Text>().text = Vals.ROLES[role];
             GameObject boardPawn = playerScript.getBoardPawn();
@@ -94,5 +99,14 @@ public class PlayerUI : MonoBehaviour
             player.getBoardPawn().transform.position = player.getLocation().transform.position;
         } 
         
+    }
+
+    public void updateActionCount(int count, int max){
+        actionsCountText.text = count + "/" + max;
+    }
+
+    public void toggleCurPlayer(Player player){
+        Image curPlayerIndicator = player.transform.GetComponentInChildren<Image>();
+        curPlayerIndicator.enabled = !curPlayerIndicator.enabled;
     }
 }

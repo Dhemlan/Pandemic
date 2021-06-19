@@ -34,6 +34,7 @@ public class PlayerManager : MonoBehaviour
             activePlayerScripts[i].setRole(provideRandomRole());
         }
         curPlayer = activePlayerScripts[0];
+        playerUI.toggleCurPlayer(curPlayer);
 
         playerUI.preparePlayerUIObjects(activePlayerObjects);
         foreach(Player player in activePlayerScripts){
@@ -62,7 +63,8 @@ public class PlayerManager : MonoBehaviour
     public IEnumerator movePhase(){
         completedActions = 0;
         Debug.Log("Player " + curPlayer.getTurnOrderPos() + " in " + curPlayer.getLocation().getName());
-        maxActions = curPlayer.getMaxActions();   
+        maxActions = curPlayer.getMaxActions();
+        playerUI.updateActionCount(completedActions, maxActions);
         yield return new WaitUntil(() => completedActions == maxActions);
         board.promptDrawPhase();
         yield return new WaitUntil(() => proceedSwitch);
@@ -71,12 +73,12 @@ public class PlayerManager : MonoBehaviour
 
     public void incrementCompletedActions(){
         completedActions++;
-        Debug.Log(completedActions + " /4 actions taken");
+        playerUI.updateActionCount(completedActions, maxActions);
     }
 
     public void endPlayerTurn(){
         curPlayer.resetOncePerTurnActions();
-        nextPlayer();
+        playerTurnOver();
     }
 
     public void drawPhaseAdd(PlayerCard card){
@@ -109,9 +111,23 @@ public class PlayerManager : MonoBehaviour
 
     public IEnumerator checkHandLimit(Player player){
         int numberCardsToDiscard = player.overHandLimit();
+        int handSize = player.getHand().Count;
+        int handWithoutEvents = player.getHandWithoutEvents().Count;
+
+        while (numberCardsToDiscard > 0 && handSize != handWithoutEvents){
+                board.requestUserAcceptContinue(Strings.PLAY_EVENT_OR_DISCARD);
+                yield return new WaitUntil(() => Vals.continueGameFlow);
+                numberCardsToDiscard = player.overHandLimit();
+                // if hand size has not changed, user has selected continue (vs played event)
+                handSize = player.getHand().Count;
+                if(numberCardsToDiscard > 0 && handSize == player.getHand().Count){
+                    break;
+                }
+        }
         if (numberCardsToDiscard > 0){
             List<PlayerCard> toDiscard = new List<PlayerCard>();
-            yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(player.getHand(), toDiscard, Vals.SELECTABLE_PLAYER_CARD, numberCardsToDiscard, null));
+            string message = Strings.DISCARD_PREFIX + numberCardsToDiscard + Strings.DISCARD_SUFFIX;
+            yield return StartCoroutine(overlayUI.requestMultiSelect(player.getHand(), toDiscard, Vals.SELECTABLE_PLAYER_CARD, numberCardsToDiscard, null, message));
             discardCards(player, toDiscard);
             foreach (PlayerCard card in toDiscard){
                 // discard animation yield return StartCoroutine(cardUI.)
@@ -137,29 +153,37 @@ public class PlayerManager : MonoBehaviour
         }
     }
     
-    public IEnumerator potentialPlayerMovement(Player player, Location loc){
-        if (player.getLocation().getResearchStationStatus() && loc.getResearchStationStatus()){
-            Debug.Log("shuttle flight");
-            playerLeavesLocation(player);
-            player.shuttleFlightAction(loc);
-            playerEntersLocation(player, loc);
+    public IEnumerator potentialPlayerMovement(Player actionTaker, Location loc){
+        Player playerMoving = actionTaker;
+        if (userSelectedPlayer != null){
+            playerMoving = userSelectedPlayer;
         }
-        else if (player.isDriveFerryValid(loc)){
+        if (playerMoving.getLocation() == loc){
+            // dispatcher attempts to move other to other's cur location
+        }
+        else if (playerMoving.getLocation().getResearchStationStatus() && loc.getResearchStationStatus()){
+            Debug.Log("shuttle flight");
+            playerLeavesLocation(playerMoving);
+            playerMoving.shuttleFlightAction(loc);
+            playerEntersLocation(playerMoving, loc);
+        }
+        else if (playerMoving.isDriveFerryValid(loc)){
             Debug.Log("drive/ferry");
-            playerLeavesLocation(player);
-            player.driveFerryAction(loc);
-            playerEntersLocation(player, loc);
+            playerLeavesLocation(playerMoving);
+            playerMoving.driveFerryAction(loc);
+            playerEntersLocation(playerMoving, loc);
         }
         else {
-            Location curLoc = player.getLocation();
-            yield return StartCoroutine(player.otherMovement(loc, (movementCompleted) =>{
+            Location curLoc = actionTaker.getLocation();
+            yield return StartCoroutine(actionTaker.otherMovement(loc, (movementCompleted) =>{
                 if (movementCompleted){
-                    playerLeavesLocation(player);
-                    playerUI.updateHand(player, player.getHand());
-                    playerEntersLocation(player, loc);
+                    playerLeavesLocation(playerMoving);
+                    playerUI.updateHand(actionTaker, actionTaker.getHand());
+                    playerEntersLocation(playerMoving, loc);
                 }
             }));
         }
+        userSelectedPlayer = null;
     }
 
     public void playerLeavesLocation(Player player){
@@ -172,6 +196,12 @@ public class PlayerManager : MonoBehaviour
         dest.playerEnters(player);
         player.enterLocation(dest);
         placePawn(player);
+    }
+
+    private void playerTurnOver(){
+        playerUI.toggleCurPlayer(curPlayer);
+        nextPlayer();
+        playerUI.toggleCurPlayer(curPlayer);
     }
 
     private void nextPlayer(){
@@ -216,12 +246,13 @@ public class PlayerManager : MonoBehaviour
     }
 
     public IEnumerator requestUserSelectPlayerToInteract(List<Player> players, string message){
-        Debug.Log("requesting from overlayUI");
+        if (players == null) players = activePlayerScripts;
         yield return StartCoroutine(overlayUI.requestSimpleSelectionFromPlayer(players, Vals.SELECTABLE_PLAYER, message));
     }
 
     public IEnumerator requestUserSelectCard(List<PlayerCard> cardsToSelectFrom, List<PlayerCard> selectedCards, int numberToSelect, Nullable<Vals.Colour> colourToSelect){
-        yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(cardsToSelectFrom, selectedCards, Vals.SELECTABLE_PLAYER_CARD, numberToSelect, colourToSelect));
+        string message = Strings.SELECT_CARD;
+        yield return StartCoroutine(overlayUI.requestMultiSelect(cardsToSelectFrom, selectedCards, Vals.SELECTABLE_PLAYER_CARD, numberToSelect, colourToSelect, message));
     }
 
     public void updateHand(Player player){
@@ -240,7 +271,7 @@ public class PlayerManager : MonoBehaviour
         playerLeavesLocation(userSelectedPlayer);
         userSelectedPlayer.setCurLoc(dest);
         playerEntersLocation(userSelectedPlayer, dest);
-        
+        userSelectedPlayer = null;  
     }
 
     public void storedEventCardPlayed(){
@@ -250,5 +281,23 @@ public class PlayerManager : MonoBehaviour
                 planner.storedEventCardPlayed();
             }
         }    
+    }
+
+    public void cureOccurs(Vals.Colour colour){
+        foreach(Player player in activePlayerScripts){
+            if(player.getRoleID() == Vals.MEDIC){
+                board.removeCubes(player.getLocation(), colour);
+            }
+        }
+    }
+
+    public List<Player> nonCurrentPlayers(){
+        List<Player> otherPlayers = new List<Player>();
+        foreach(Player player in activePlayerScripts){
+            if (player != curPlayer){
+                otherPlayers.Add(player);
+            }
+        }
+        return otherPlayers;
     }
 }

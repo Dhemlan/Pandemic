@@ -13,7 +13,7 @@ public class Card
         return name;
     }
 
-    public int getId(){
+    public int getID(){
         return id;
     }
 

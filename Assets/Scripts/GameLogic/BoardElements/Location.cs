@@ -21,20 +21,20 @@ public class Location : MonoBehaviour
         diseaseCubes[(int)colour]++;
     }
 
-    public bool qSpecialistHere(){
+    public bool specificRoleHere(int roleID){
         foreach (Player player in localPlayers){
-            if (player.getRoleID() == Vals.QUARANTINE_SPECIALIST){
+            if (player.getRoleID() == roleID){
                 return true;
             }
         }
         return false;
     }
 
-    public bool removeCube(){
-        if (diseaseCubes[(int) colour] == 0){
+    public bool removeCube(Vals.Colour colourToTreat){
+        if (diseaseCubes[(int)colourToTreat] == 0){
             return false;
         } 
-        diseaseCubes[(int) colour]--;
+        diseaseCubes[(int)colourToTreat]--;
         return true;
     }
 

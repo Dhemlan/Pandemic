@@ -12,7 +12,7 @@ public class SelectablePlayer : MonoBehaviour, ISelectable<Player>
 
     public void OnMouseDown(){  
         GameObject.Find("PlayerManager").GetComponent<PlayerManager>().setUserSelectedPlayer(player);
-        Vals.proceed = true;
+        Vals.continueAfterSelect = true;
     }
 
     public void populateItemData(Player player){

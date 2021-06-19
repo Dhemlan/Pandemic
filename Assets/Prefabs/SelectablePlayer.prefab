@@ -28,16 +28,16 @@ RectTransform:
   m_GameObject: {fileID: 4056347134304278116}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -428.4707}
-  m_LocalScale: {x: 5, y: 5, z: 0}
+  m_LocalScale: {x: 65, y: 65, z: 0}
   m_Children:
   - {fileID: 4286874279040194078}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 52.287895, y: -48.585205}
-  m_SizeDelta: {x: 3, y: 1.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 52.287903, y: -49.085205}
+  m_SizeDelta: {x: -873, y: -521.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7523836941183008670
 MonoBehaviour:
@@ -123,7 +123,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.015533805, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -134,7 +134,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.83334, y: 1.5}
+  m_Size: {x: 1.1553159, y: 1.5}
   m_EdgeRadius: 0
 --- !u!1001 &4554986539610173010
 PrefabInstance:
@@ -206,17 +206,17 @@ PrefabInstance:
     - target: {fileID: 308665274294696012, guid: 040de7539c3be754cb42b5f20e393454,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.046
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 308665274294696012, guid: 040de7539c3be754cb42b5f20e393454,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1.645
+      value: -1.23
       objectReference: {fileID: 0}
     - target: {fileID: 308665274294696012, guid: 040de7539c3be754cb42b5f20e393454,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 290.702
+      value: 350
       objectReference: {fileID: 0}
     - target: {fileID: 308665274294696012, guid: 040de7539c3be754cb42b5f20e393454,
         type: 3}
@@ -256,12 +256,12 @@ PrefabInstance:
     - target: {fileID: 308665274294696012, guid: 040de7539c3be754cb42b5f20e393454,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.0053630453
+      value: 0.005
       objectReference: {fileID: 0}
     - target: {fileID: 308665274294696012, guid: 040de7539c3be754cb42b5f20e393454,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.0053630453
+      value: 0.005
       objectReference: {fileID: 0}
     - target: {fileID: 308665274294696012, guid: 040de7539c3be754cb42b5f20e393454,
         type: 3}
@@ -271,7 +271,7 @@ PrefabInstance:
     - target: {fileID: 7143841038722143907, guid: 040de7539c3be754cb42b5f20e393454,
         type: 3}
       propertyPath: m_Text
-      value: Test
+      value: Quarantine Specialist
       objectReference: {fileID: 0}
     - target: {fileID: 7143841038722143907, guid: 040de7539c3be754cb42b5f20e393454,
         type: 3}
@@ -292,6 +292,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_FontData.m_FontSize
       value: 65
+      objectReference: {fileID: 0}
+    - target: {fileID: 7143841038722143907, guid: 040de7539c3be754cb42b5f20e393454,
+        type: 3}
+      propertyPath: m_FontData.m_BestFit
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 040de7539c3be754cb42b5f20e393454, type: 3}

@@ -85,7 +85,7 @@ public class Player : MonoBehaviour
         if (role.nonStandardMove(this,dest)){
             if (role.getID() == Vals.OPERATIONS_EXPERT){
                 List<PlayerCard> selectedCard = new List<PlayerCard>();
-                yield return StartCoroutine(playerManager.requestUserSelectCard(hand, selectedCard, 1, null));
+                yield return StartCoroutine(playerManager.requestUserSelectCard(getHandWithoutEvents(), selectedCard, 1, null));
                 playerManager.removeCardFromHand(this, selectedCard[0], true);
             }
             moveCompleted();
@@ -176,7 +176,7 @@ public class Player : MonoBehaviour
                     //request target
                     Debug.Log("choose who to give to");
                     string message = "Select player to trade with";
-                    yield return StartCoroutine(playerManager.requestUserSelectPlayerToInteract(localPlayers, message));
+                    yield return StartCoroutine(playerManager.requestUserSelectPlayerToInteract(playerManager.nonCurrentPlayers(), message));
                 }
                 else{
                     if (localPlayers[0] == this){
@@ -187,6 +187,7 @@ public class Player : MonoBehaviour
                     }
                 }
                 cardExchange(cardToTrade, this, playerManager.getUserSelectedPlayer());
+                playerManager.setUserSelectedPlayer(null);
                 playerManager.incrementCompletedActions();
             }        
         }   
@@ -259,6 +260,7 @@ public class Player : MonoBehaviour
 
     public void enterLocation(Location dest){
         curLoc = dest;
+        role.enterLocation(board, curLoc);
     }
 
     public void resetOncePerTurnActions(){
@@ -287,6 +289,16 @@ public class Player : MonoBehaviour
     
     public List<PlayerCard> getHand(){
         return hand;
+    }
+
+    public List<PlayerCard> getHandWithoutEvents(){
+        List<PlayerCard> cards = new List<PlayerCard>();
+        foreach(PlayerCard card in hand){
+            if (card.getColour() != Vals.Colour.EVENT){
+                cards.Add(card);
+            }
+        }
+        return cards;
     }
 
     public void setRole(Role role){

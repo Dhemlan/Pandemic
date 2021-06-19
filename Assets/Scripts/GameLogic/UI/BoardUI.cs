@@ -4,10 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class BoardUI : MonoBehaviour
-{
-    public CardUI cardUI;
-    
-    public GameObject exampleLocation;
+{  
     public GameObject diseaseCubePrefab;
     public Sprite[] diseaseCubeSprites;
 
@@ -20,6 +17,8 @@ public class BoardUI : MonoBehaviour
     public Sprite[] eradicatedSprites;
 
     public Button drawButton;
+    public GameObject continueButton;
+    public Slider continueInfectionSlider;
 
     public void boardSetUp(int playerDeckCount){
         setPlayerDeckCount(playerDeckCount);
@@ -37,24 +36,50 @@ public class BoardUI : MonoBehaviour
 
     public IEnumerator addCube(Location loc, Vals.Colour colour){
         GameObject diseaseCube = Instantiate(diseaseCubePrefab, new Vector3(10,10,0), Quaternion.identity, loc.transform);
+        diseaseCube.GetComponent<DiseaseCubeRotator>().setColour(colour);
         SpriteRenderer renderer = diseaseCube.GetComponent<SpriteRenderer>();
         renderer.sprite = diseaseCubeSprites[(int)colour];
-        renderer.sortingOrder = 4;
+        //renderer.sortingOrder = 4;
         
+        initiateCubeMovement(loc);
+        yield return new WaitForSeconds(.3f);
+    }
+
+    public void initiateCubeMovement(Location loc){
         DiseaseCubeRotator[] cubes = loc.transform.GetComponentsInChildren<DiseaseCubeRotator>();
         int i = 0;
         foreach (DiseaseCubeRotator cube in cubes){
             float theta = (2 * Mathf.PI / cubes.Length) * i;
-            float bufferDistance = 1.9f;
+            float bufferDistance = 1.8f;
             cube.transform.position = new Vector3(loc.transform.position.x - bufferDistance * Mathf.Cos(theta), loc.transform.position.y - bufferDistance * Mathf.Sin(theta), 0);
             i++;
-            cube.setSpeed(cubes.Length);
+            adjustCubeSpeed(cube, cubes.Length);
         }
-        yield return new WaitForSeconds(.3f);
     }
 
+    public void adjustSpeedForAllCubes(Location loc){
+        DiseaseCubeRotator[] cubes = loc.transform.GetComponentsInChildren<DiseaseCubeRotator>();
+        foreach(DiseaseCubeRotator cube in cubes){
+            adjustCubeSpeed(cube, cubes.Length);
+        }
+    }
+
+    public void adjustCubeSpeed(DiseaseCubeRotator cube, int count){
+        cube.setSpeed(count);
+    }
+
+
     public void removeCube(Location loc, Vals.Colour colour){
-        Destroy(loc.transform.GetChild(1).gameObject);
+        foreach(DiseaseCubeRotator cube in loc.transform.GetComponentsInChildren<DiseaseCubeRotator>()){
+            Debug.Log(loc.transform.GetComponentsInChildren<DiseaseCubeRotator>().Length);
+            if (cube.getColour() == colour){
+                cube.transform.SetParent(this.transform); //to ensure next Destroy isn't called on same object before frame updates
+                Debug.Log("Destroying UI cube " + colour);
+                Destroy(cube.gameObject);
+                break;
+            }
+        }
+        adjustSpeedForAllCubes(loc);
     }
 
     public void increaseOutbreakCounter(int newCount){
@@ -82,4 +107,8 @@ public class BoardUI : MonoBehaviour
         station.enabled = !station.enabled;
     }
 
+    public bool confirmInfectionPhase(){
+        if (continueInfectionSlider.value == 0) return false;
+        return true;
+    }
 }
