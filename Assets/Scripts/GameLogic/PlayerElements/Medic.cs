@@ -13,7 +13,11 @@ public class Medic : Role
         return true;
     }
 
-    public override void enterLocation(){
-
+    public override void enterLocation(Board board, Location loc){
+        for (int i = 0; i < Vals.DISEASE_COUNT; i++){
+            if (board.isDiseaseCured((Vals.Colour)i)){
+                board.removeCubes(loc, (Vals.Colour)i);
+            }
+        }
     }
 }

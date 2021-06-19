@@ -5,35 +5,37 @@ using UnityEngine.UI;
 
 public class PlayerUI : MonoBehaviour
 {   
-    private List<GameObject> players;
     private List<Text[]> playerHandCardNames = new List<Text[]>();
     private List<SpriteRenderer[]> playerHandIcons = new List<SpriteRenderer[]>();
 
     public Sprite[] diseaseIconSprites;
-    public GameObject[] pawns;
     public Sprite[] pawnSprites;
+    public Sprite[] actionIconSprites;
+    public Text actionsCountText;
 
     public void preparePlayerUIObjects(List<GameObject> players){
-        this.players = players;
-        int i = 0;
         foreach (GameObject player in players){
             // Gather active hand resources
             playerHandCardNames.Add(player.GetComponentsInChildren<Text>());
             playerHandIcons.Add(player.GetComponentsInChildren<SpriteRenderer>());
             // Activate required number of players
             player.SetActive(true);
-            pawns[i].SetActive(true);
             
             // Assign sprites
-            int role = player.GetComponent<Player>().getRoleID();
+            Player playerScript = player.GetComponent<Player>();
+            int role = playerScript.getRoleID();
             Transform pawn = player.transform.Find("Pawn");
             pawn.GetComponent<SpriteRenderer>().sprite = pawnSprites[role];
             if (role == Vals.DISPATCHER || role == Vals.CONTINGENCY_PLANNER){
-                pawn.transform.Find("CharacterAction").gameObject.SetActive(true);
+                GameObject actionIcon = pawn.transform.Find("CharacterAction").gameObject;
+                actionIcon.SetActive(true);
+                actionIcon.GetComponent<SpriteRenderer>().sprite = actionIconSprites[role];
+                actionIcon.GetComponentInChildren<Text>().text = Vals.actionIconLabels[role];
             }
             player.transform.Find("PlayerName").GetComponent<Text>().text = Vals.ROLES[role];
-            pawns[i].GetComponent<SpriteRenderer>().sprite = pawnSprites[role];
-            i++;
+            GameObject boardPawn = playerScript.getBoardPawn();
+            boardPawn.GetComponent<SpriteRenderer>().sprite = pawnSprites[role];
+            updatePawns(playerScript.getLocation());
         }
     }
 
@@ -48,10 +50,63 @@ public class PlayerUI : MonoBehaviour
             playerHandCardNames[player.turnOrderPos - 1][i].text = "";
             playerHandIcons[player.turnOrderPos - 1][i].sprite = null;
         }
-        //Debug.Log("i " + i);
     }
 
-    public void placePawn(int turnOrderPos, Location loc){
-        pawns[turnOrderPos].transform.position = loc.transform.position;
+    public void updatePawns(Location loc){
+        List<Player> localPlayers = loc.getLocalPlayers();
+        float x = -.5f;
+        switch (localPlayers.Count){
+            case 1:   
+                localPlayers[0].getBoardPawn().transform.position = loc.transform.position;
+
+                break;
+            case 2:
+                foreach (Player player in localPlayers){
+                    GameObject pawn = player.getBoardPawn();
+                    pawn.transform.position = loc.transform.position;
+                    pawn.transform.Translate(x,0,0);
+                    x *= -1;
+                }
+                break;
+            case 3:
+                foreach (Player player in localPlayers){
+                    GameObject pawn = player.getBoardPawn();
+                    pawn.transform.position = loc.transform.position;
+                    pawn.transform.Translate(x,0,0);
+                    x += 1.0f;
+                }
+                break;
+            case 4:
+                x = -.75f;
+                foreach (Player player in localPlayers){
+                    GameObject pawn = player.getBoardPawn();
+                    pawn.transform.position = loc.transform.position;
+                    pawn.transform.Translate(x,0,0);
+                    x += .75f;
+                    
+                }
+                break; 
+        }    
+    }
+
+    public void placePawn(Player player){
+        List<Player> localPlayers = player.getLocation().getLocalPlayers();
+        Debug.Log("local players: " + localPlayers.Count);
+        if (player.getLocation().getLocalPlayers().Count > 1){
+            updatePawns(player.getLocation());
+        }
+        else{
+            player.getBoardPawn().transform.position = player.getLocation().transform.position;
+        } 
+        
+    }
+
+    public void updateActionCount(int count, int max){
+        actionsCountText.text = count + "/" + max;
+    }
+
+    public void toggleCurPlayer(Player player){
+        Image curPlayerIndicator = player.transform.GetComponentInChildren<Image>();
+        curPlayerIndicator.enabled = !curPlayerIndicator.enabled;
     }
 }

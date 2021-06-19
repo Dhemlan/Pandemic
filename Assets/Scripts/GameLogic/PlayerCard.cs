@@ -23,7 +23,7 @@ public class PlayerCard : Card, IComparable<PlayerCard>
     }
 
     public int CompareTo(PlayerCard o){
-        if(colour < o.getColour()){
+        if(colour > o.getColour()){
             return -1;
         }
         else return 1;

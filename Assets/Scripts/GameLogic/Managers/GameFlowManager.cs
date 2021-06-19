@@ -6,9 +6,6 @@ using UnityEngine.UI;
 
 public class GameFlowManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    private bool gameOverFlag = false;
-
     public Board board;
     public PlayerManager playerManager;
 
@@ -22,8 +19,7 @@ public class GameFlowManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private IEnumerator gameFlow(){
-        
+    private IEnumerator gameFlow(){      
         phase = Vals.Phase.SET_UP;
         yield return StartCoroutine(board.boardSetUp(epidemicCardCount));  
         while (true){
@@ -31,25 +27,38 @@ public class GameFlowManager : MonoBehaviour
             yield return StartCoroutine(playerManager.movePhase());
             phase = Vals.Phase.DRAW;
             yield return StartCoroutine(board.drawPhase());
-            if (!Vals.oneQuietNightActive){
-                phase = Vals.Phase.INFECTION;
-                yield return StartCoroutine(board.infectionPhase());
-            }
-            else {
-                Vals.oneQuietNightActive = false;
-            }
+            yield return new WaitUntil(() => Vals.continueGameFlow);
+            phase = Vals.Phase.INFECTION;
+            yield return StartCoroutine(board.infectionPhase());
+            
             playerManager.endPlayerTurn();
         }
         yield break;
+    }
+
+    public void continueGameFlow(){
+        Vals.continueGameFlow = true;
     }
 
     public Vals.Phase getPhase(){
         return phase;
     }
 
-
-    public void gameOver(string message){
-        Debug.Log(message);
-        SceneManager.LoadScene("GameOver");
+    public IEnumerator gameOver(Vals.GameOver reason){
+        yield return StartCoroutine(gameObject.GetComponent<FadeToBlack>().fadeToBlack());
+        switch (reason){
+            case Vals.GameOver.CUBES :
+                SceneManager.LoadScene("GameOverCubes");
+                break;
+            case Vals.GameOver.OUTBREAKS :
+                SceneManager.LoadScene("GameOverOutbreaks");
+                break;
+            case Vals.GameOver.CARDS :
+                SceneManager.LoadScene("GameOverCards");
+                break;
+            case Vals.GameOver.WIN :
+                SceneManager.LoadScene("GameOverWin");
+                break;
+        }
     }
 }

@@ -15,29 +15,34 @@ public class EventCardHandler : MonoBehaviour
     }
 
     public IEnumerator handleEventCardClick(PlayerCard card){
-        overlayUI.StopAllCoroutines();
-        overlayUI.deactivateInteractableOverlay();
-        switch (card.getId()){
+        //overlayUI.StopAllCoroutines();
+        overlayUI.finishedWithDisplayOverlay();
+        Vals.continueGameFlow = false;
+        switch (card.getID()){
             case Vals.ONE_QUIET_NIGHT:
                 if(Vals.oneQuietNightActive) yield break;
                 Debug.Log("Playing One Quiet Night");
                 Vals.oneQuietNightActive = true;
+                Vals.continueGameFlow = true;
                 break;
             case Vals.AIRLIFT:
                 Debug.Log("Playing Airlift");
-                string message = "Select player to Airlift then select destination";
-                yield return StartCoroutine(overlayUI.requestSimpleSelectionFromPlayer(playerManager.getPlayers(), Vals.SELECTABLE_PLAYER, message));
+                string message = Strings.AIRLIFT;
                 Vals.cardResolving = Vals.AIRLIFT;
+                yield return StartCoroutine(overlayUI.requestSimpleSelectionFromPlayer(playerManager.getPlayers(), Vals.SELECTABLE_PLAYER, message));
                 break;
             case Vals.RESILIENT_POPULATION:
                 Debug.Log("Playing Resilient Population");
                 if (board.getInfectionDiscardPile().Count > 0){
-                    yield return StartCoroutine(resilientPopulation());
+                    yield return StartCoroutine(resilientPopulation());     
                 }
+                Vals.continueGameFlow = true;
                 break;
             case Vals.FORECAST:
                 Debug.Log("Playing Forecast");
                 yield return StartCoroutine(forecast());
+
+                Vals.continueGameFlow = true;
                 break;
             case Vals.GOVERNMENT_GRANT:
                 Debug.Log("Playing Government Grant");
@@ -45,13 +50,14 @@ public class EventCardHandler : MonoBehaviour
                 break;
         }
         board.eventCardPlayed(card);
+        overlayUI.closeToast();
         yield break;
     }
 
     private IEnumerator resilientPopulation(){
-        Debug.Log("res pop executing");
         List<InfectionCard> selected = new List<InfectionCard>();
-        yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(board.getInfectionDiscardPile(), selected, Vals.SELECTABLE_INFECTION_CARD, 1, null));
+        string message = Strings.RESILIENT_POPULATION;
+        yield return StartCoroutine(overlayUI.requestMultiSelect(board.getInfectionDiscardPile(), selected, Vals.SELECTABLE_INFECTION_CARD, 1, null, message));
         board.removeInfectionCardFromDiscard(selected[0]);
     }
 
@@ -64,7 +70,8 @@ public class EventCardHandler : MonoBehaviour
             top6Cards.Add(infectionDeck.Pop());
         }
         clickedCards.Clear();
-        yield return StartCoroutine(overlayUI.requestSelectableFromPlayer(top6Cards, new List<InfectionCard>(), Vals.SELECTABLE_INFECTION_CARD, 6, null));
+        string message = Strings.FORECAST;
+        yield return StartCoroutine(overlayUI.requestMultiSelect(top6Cards, new List<InfectionCard>(), Vals.SELECTABLE_INFECTION_CARD, 6, null, message));
 
         for (int i = clickedCards.Count; i > 0; i--){
             infectionDeck.Push(clickedCards[i - 1]);

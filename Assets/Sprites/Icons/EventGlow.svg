@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg id="Capa_1" enable-background="new 0 0 484.559 484.559" height="500px" viewBox="0 0 0 0" width="500px" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <view id="view-1">
+      <title>View 1</title>
+    </view>
+  </defs>
+  <circle style="fill-opacity: 0.47; fill: rgb(255, 255, 0);" cx="250" cy="250" r="275" transform="matrix(0.707107, 0.707107, -0.707107, 0.707107, 250, -103.553367)" bx:origin="0 0"/>
+  <circle style="paint-order: fill; fill-rule: nonzero; stroke-width: 12px; stroke: rgb(0, 0, 0); fill: rgb(255, 255, 0);" cx="250" cy="250" r="250" transform="matrix(0.707107, 0.707107, -0.707107, 0.707107, 250, -103.553367)"/>
+  <g transform="matrix(0.707107, 0.707107, -0.707107, 0.707107, 250, -103.553391)"/>
+  <g transform="matrix(-0.707107, -0.707107, 0.707107, -0.707107, 253.535522, 607.088928)"/>
+  <g transform="matrix(0.707107, 0.707107, -0.707107, 0.707107, 250, -103.553391)">
+    <line style="stroke: rgb(0, 0, 0); stroke-linejoin: round; stroke-width: 20px;" x1="91" y1="58" x2="91" y2="442" bx:origin="0 0"/>
+    <line style="stroke: rgb(0, 0, 0); stroke-linejoin: round; stroke-width: 20px;" x1="110" y1="42" x2="110" y2="458" bx:origin="0 0"/>
+  </g>
+  <g transform="matrix(-0.707107, -0.707107, 0.707107, -0.707107, 256.363953, 609.917358)">
+    <line style="stroke: rgb(0, 0, 0); stroke-linejoin: round; stroke-width: 20px;" x1="100" y1="58" x2="100" y2="442" bx:origin="0 0"/>
+    <line style="stroke: rgb(0, 0, 0); stroke-linejoin: round; stroke-width: 20px;" x1="119" y1="42" x2="119" y2="458" bx:origin="0 0"/>
+    <g>
+      <line style="stroke: rgb(0, 0, 0); stroke-linejoin: round; stroke-width: 20px;" x1="100" y1="58" x2="100" y2="442" bx:origin="0 0"/>
+      <line style="stroke: rgb(0, 0, 0); stroke-linejoin: round; stroke-width: 20px;" x1="119" y1="42" x2="119" y2="458" bx:origin="0 0"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, 100.000008, 0.000007)">
+      <g>
+        <g>
+          <line style="stroke: rgb(0, 0, 0); stroke-linejoin: round; stroke-width: 20px;" x1="100" y1="10" x2="100" y2="490" bx:origin="0 0"/>
+          <line style="stroke: rgb(0, 0, 0); stroke-linejoin: round; stroke-width: 20px;" x1="119" y1="0" x2="119" y2="500" bx:origin="0 0"/>
+        </g>
+        <g transform="matrix(-1, 0, 0, -1, 319, 500)">
+          <line style="stroke: rgb(0, 0, 0); stroke-linejoin: round; stroke-width: 20px;" x1="100" y1="10" x2="100" y2="490" bx:origin="0 0"/>
+          <line style="stroke: rgb(0, 0, 0); stroke-linejoin: round; stroke-width: 20px;" x1="119" y1="0" x2="119" y2="500" bx:origin="0 0"/>
+        </g>
+      </g>
+      <g transform="matrix(-1, 0, 0, -1, 319, 500)"/>
+    </g>
+  </g>
+</svg>

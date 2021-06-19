@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InteractablePlayerCard : MonoBehaviour, ISelectable<PlayerCard>
+public class SelectablePlayerCard : MonoBehaviour, ISelectable<PlayerCard>
 {
     private PlayerCard card;
     public GameObject selectedIcon;
