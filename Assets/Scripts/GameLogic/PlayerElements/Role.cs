@@ -53,7 +53,7 @@ public class Role
         return false;
     }
 
-    public virtual void enterLocation(){
+    public virtual void enterLocation(Board board, Location loc){
 
     }
 

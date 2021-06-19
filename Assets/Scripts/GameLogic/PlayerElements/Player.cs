@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
 
     private PlayerCard cardToTrade;
     public Board board;
+    public GameObject boardPawn;
 
     public void Awake(){
         curLoc = startingLoc;
@@ -50,7 +51,7 @@ public class Player : MonoBehaviour
     }
 
     public void shuttleFlightAction(Location dest){
-        moveCompleted(dest);
+        moveCompleted();
     }
 
     public bool isDriveFerryValid(Location dest){
@@ -58,7 +59,7 @@ public class Player : MonoBehaviour
     }
 
     public void driveFerryAction(Location dest){
-        moveCompleted(dest);
+        moveCompleted();
     }
 
     public void commercialFlightAction(PlayerCard cardToDiscard, Location dest){
@@ -73,11 +74,10 @@ public class Player : MonoBehaviour
 
     public void moveRequiringDiscard(PlayerCard cardToDiscard, Location dest){
         playerManager.removeCardFromHand(this, cardToDiscard, true);
-        moveCompleted(dest);
+        moveCompleted();
     }
 
-    public void moveCompleted(Location dest){
-        curLoc = dest;
+    public void moveCompleted(){
         playerManager.incrementCompletedActions();
     }
 
@@ -85,10 +85,10 @@ public class Player : MonoBehaviour
         if (role.nonStandardMove(this,dest)){
             if (role.getID() == Vals.OPERATIONS_EXPERT){
                 List<PlayerCard> selectedCard = new List<PlayerCard>();
-                yield return StartCoroutine(playerManager.requestUserSelectCard(hand, selectedCard, 1, null));
+                yield return StartCoroutine(playerManager.requestUserSelectCard(getHandWithoutEvents(), selectedCard, 1, null));
                 playerManager.removeCardFromHand(this, selectedCard[0], true);
             }
-            moveCompleted(dest);
+            moveCompleted();
             callback(true);
             yield break;
         }
@@ -108,7 +108,7 @@ public class Player : MonoBehaviour
             else{
                 commercialFlightAction(clickedLocCard, dest);
             }
-            moveCompleted(dest);
+            moveCompleted();
             callback(true);
             yield break;
         }
@@ -176,7 +176,7 @@ public class Player : MonoBehaviour
                     //request target
                     Debug.Log("choose who to give to");
                     string message = "Select player to trade with";
-                    yield return StartCoroutine(playerManager.requestUserSelectPlayerToInteract(localPlayers, message));
+                    yield return StartCoroutine(playerManager.requestUserSelectPlayerToInteract(playerManager.nonCurrentPlayers(), message));
                 }
                 else{
                     if (localPlayers[0] == this){
@@ -187,6 +187,7 @@ public class Player : MonoBehaviour
                     }
                 }
                 cardExchange(cardToTrade, this, playerManager.getUserSelectedPlayer());
+                playerManager.setUserSelectedPlayer(null);
                 playerManager.incrementCompletedActions();
             }        
         }   
@@ -258,7 +259,8 @@ public class Player : MonoBehaviour
     }
 
     public void enterLocation(Location dest){
-
+        curLoc = dest;
+        role.enterLocation(board, curLoc);
     }
 
     public void resetOncePerTurnActions(){
@@ -289,6 +291,16 @@ public class Player : MonoBehaviour
         return hand;
     }
 
+    public List<PlayerCard> getHandWithoutEvents(){
+        List<PlayerCard> cards = new List<PlayerCard>();
+        foreach(PlayerCard card in hand){
+            if (card.getColour() != Vals.Colour.EVENT){
+                cards.Add(card);
+            }
+        }
+        return cards;
+    }
+
     public void setRole(Role role){
         this.role = role;
     }
@@ -299,5 +311,9 @@ public class Player : MonoBehaviour
 
     public int getRoleID(){
         return role.getID();
+    }
+
+    public GameObject getBoardPawn(){
+        return boardPawn;
     }
 }

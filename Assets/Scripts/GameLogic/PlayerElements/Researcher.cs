@@ -10,10 +10,9 @@ public class Researcher : Role
     }
 
     public override void findGiveableCards(Player player, List<PlayerCard> potentialCards){
-        foreach(PlayerCard card in player.getHand()){
-            if (card.getColour() != Vals.Colour.EVENT){
-                potentialCards.Add(card);
-            }
+        foreach (PlayerCard card in player.getHandWithoutEvents()){
+            potentialCards.Add(card);
         }
+        Debug.Log(potentialCards.Count);
     }
 }

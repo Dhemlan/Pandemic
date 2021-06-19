@@ -33,7 +33,7 @@ public class BoardGenerator : MonoBehaviour
     }
     public IEnumerator buildInitialResearchStations(Board board){
         yield return StartCoroutine(board.buildResearchStation(locations[Vals.ATLANTA]));
-        yield return StartCoroutine(board.buildResearchStation(locations[Vals.BANGKOK]));
+        //yield return StartCoroutine(board.buildResearchStation(locations[Vals.BANGKOK]));
         /*yield return StartCoroutine(board.buildResearchStation(locations[Vals.SYDNEY]));
         yield return StartCoroutine(board.buildResearchStation(locations[Vals.LIMA]));
         yield return StartCoroutine(board.buildResearchStation(locations[Vals.PARIS]));

@@ -28,6 +28,8 @@ public class Vals
                             new int[]{HONG_KONG,TAIPEI,TOKYO,BEIJING,SEOUL},new int[]{SHANGHAI,SEOUL},new int[]{TOKYO,SHANGHAI,BEIJING}
                         };
 
+    public static string[] actionIconLabels = new string[] {"RETRIEVE","MOVE\nOTHERS"};
+
     // Set-up
     public const int BASE_INFECTION_RATE = 2;
     public const int OUTBREAK_COUNT_LIMIT = 8;
@@ -51,10 +53,14 @@ public class Vals
     
     // Code-related values
     public static bool proceed = false;
+    public static bool continueGameFlow = true;
+    public static bool continueAfterSelect = false;
+    public static bool continueAfterMultiSelect = false;
     public static bool oneQuietNightActive = false;
     public static bool removeResearchStation = false;
+    public static bool eventResolving = false;
     public static int cardResolving = -1;
-    public const int MAX_HAND_SIZE = 8;
+    public const int MAX_HAND_SIZE = 10;
     public const float GENERIC_WAIT_TIME = 0.75f;
     
 
@@ -71,6 +77,7 @@ public class Vals
     public const string GAME_OVER_CARDS = "You've ran out of time\n Game Over";
     public const string GAME_OVER_CURES = "Cures have been found for all disease\nThe world is saved!";
 
+    public enum GameOver {CUBES, OUTBREAKS, CARDS, WIN};
     public enum Colour {YELLOW, BLUE, BLACK, RED, EVENT, EPIDEMIC};
 
     public enum Phase {SET_UP, ACTION, DRAW, INFECTION};

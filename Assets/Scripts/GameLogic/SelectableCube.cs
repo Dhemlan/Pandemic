@@ -9,7 +9,7 @@ public class SelectableCube : MonoBehaviour, ISelectable<Vals.Colour>
 
     public void OnMouseDown(){
         GameObject.Find("ActionManager").GetComponent<ActionManager>().setPlayerSelectedCube(colour);
-        Vals.proceed = true;
+        Vals.continueAfterSelect = true;
     }
 
     public void populateItemData(Vals.Colour colour){

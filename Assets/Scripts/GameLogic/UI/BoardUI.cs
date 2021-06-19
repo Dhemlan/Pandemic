@@ -4,11 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class BoardUI : MonoBehaviour
-{
-    public CardUI cardUI;
-    
-    public GameObject exampleLocation;
-    public GameObject[] cubePrefabs;
+{  
+    public GameObject diseaseCubePrefab;
+    public Sprite[] diseaseCubeSprites;
 
     public Text[] cubeReserveText;
     public Text outbreaksCounterText, playerDeckCountText;
@@ -19,6 +17,8 @@ public class BoardUI : MonoBehaviour
     public Sprite[] eradicatedSprites;
 
     public Button drawButton;
+    public GameObject continueButton;
+    public Slider continueInfectionSlider;
 
     public void boardSetUp(int playerDeckCount){
         setPlayerDeckCount(playerDeckCount);
@@ -35,23 +35,51 @@ public class BoardUI : MonoBehaviour
     }
 
     public IEnumerator addCube(Location loc, Vals.Colour colour){
-        GameObject diseaseCube = Instantiate(cubePrefabs[(int)colour], new Vector3(10,10,0), Quaternion.identity);
-        diseaseCube.transform.SetParent(loc.transform);
-        float width = exampleLocation.GetComponent<SpriteRenderer>().sprite.bounds.size.x *.35f;
+        GameObject diseaseCube = Instantiate(diseaseCubePrefab, new Vector3(10,10,0), Quaternion.identity, loc.transform);
+        diseaseCube.GetComponent<DiseaseCubeRotator>().setColour(colour);
+        SpriteRenderer renderer = diseaseCube.GetComponent<SpriteRenderer>();
+        renderer.sprite = diseaseCubeSprites[(int)colour];
+        //renderer.sortingOrder = 4;
         
-        Transform[] cubes = loc.transform.GetComponentsInChildren<Transform>();
-        float space = 2 * width / cubes.Length;
-        float pos = space * (cubes.Length - 1) / 2f;
-        
-        for (int i = 1; i < cubes.Length; i++){
-            cubes[i].transform.position = new Vector3(loc.transform.position.x - pos, loc.transform.position.y - width, 0);
-            pos -= space;
-        }
+        initiateCubeMovement(loc);
         yield return new WaitForSeconds(.3f);
     }
 
+    public void initiateCubeMovement(Location loc){
+        DiseaseCubeRotator[] cubes = loc.transform.GetComponentsInChildren<DiseaseCubeRotator>();
+        int i = 0;
+        foreach (DiseaseCubeRotator cube in cubes){
+            float theta = (2 * Mathf.PI / cubes.Length) * i;
+            float bufferDistance = 1.8f;
+            cube.transform.position = new Vector3(loc.transform.position.x - bufferDistance * Mathf.Cos(theta), loc.transform.position.y - bufferDistance * Mathf.Sin(theta), 0);
+            i++;
+            adjustCubeSpeed(cube, cubes.Length);
+        }
+    }
+
+    public void adjustSpeedForAllCubes(Location loc){
+        DiseaseCubeRotator[] cubes = loc.transform.GetComponentsInChildren<DiseaseCubeRotator>();
+        foreach(DiseaseCubeRotator cube in cubes){
+            adjustCubeSpeed(cube, cubes.Length);
+        }
+    }
+
+    public void adjustCubeSpeed(DiseaseCubeRotator cube, int count){
+        cube.setSpeed(count);
+    }
+
+
     public void removeCube(Location loc, Vals.Colour colour){
-        Destroy(loc.transform.GetChild(0).gameObject);
+        foreach(DiseaseCubeRotator cube in loc.transform.GetComponentsInChildren<DiseaseCubeRotator>()){
+            Debug.Log(loc.transform.GetComponentsInChildren<DiseaseCubeRotator>().Length);
+            if (cube.getColour() == colour){
+                cube.transform.SetParent(this.transform); //to ensure next Destroy isn't called on same object before frame updates
+                Debug.Log("Destroying UI cube " + colour);
+                Destroy(cube.gameObject);
+                break;
+            }
+        }
+        adjustSpeedForAllCubes(loc);
     }
 
     public void increaseOutbreakCounter(int newCount){
@@ -64,10 +92,6 @@ public class BoardUI : MonoBehaviour
 
     public void activateDrawButton(){
         drawButton.gameObject.SetActive(true);
-    }
-
-    public void buildResearchStation(){
-        
     }
 
     public void diseaseCured(Vals.Colour colour){
@@ -83,4 +107,8 @@ public class BoardUI : MonoBehaviour
         station.enabled = !station.enabled;
     }
 
+    public bool confirmInfectionPhase(){
+        if (continueInfectionSlider.value == 0) return false;
+        return true;
+    }
 }
