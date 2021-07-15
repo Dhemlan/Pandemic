@@ -30,5 +30,6 @@ public class Strings
 
     // selection
     public const string SELECT_PLAYER_MOVE = "Select player to move";
+    public const string REPLACE_RESEARCH_STATION = "Select research station to remove";
 }
 

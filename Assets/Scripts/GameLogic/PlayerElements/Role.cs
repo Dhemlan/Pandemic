@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Role
+public class Role 
 {   
     protected int cardsToCure = Vals.DEFAULT_CARDS_TO_CURE;
     private bool researchStationRequiredToCure = true;
@@ -22,7 +22,7 @@ public class Role
     public virtual bool buildAction(Player player){
         Debug.Log("default build");
         foreach (PlayerCard card in player.getHand()){
-            if (player.getLocation().Equals(card.getLocation())){
+            if (player.CurLoc.Equals(card.Location)){
                 player.discardCard(card);
                 return true;
             }
@@ -43,9 +43,9 @@ public class Role
     }
 
     public virtual void findGiveableCards(Player player, List<PlayerCard> potentialCards){
-        if (player.hasCardByLoc(player.getLocation())){
-            Debug.Log("can give " + player.getLocation());
-            potentialCards.Add(player.retrieveCardByLoc(player.getLocation()));
+        if (player.hasCardByLoc(player.CurLoc)){
+            Debug.Log("can give " + player.CurLoc);
+            potentialCards.Add(player.retrieveCardByLoc(player.CurLoc));
         }
     }
 
@@ -62,11 +62,6 @@ public class Role
         yield break;
     } 
 
-    public int getID(){
-        return id;
-    }
-
-    public string getName(){
-        return name;
-    }
+    public int ID { get => id; set => id = value; }
+    public string Name { get => name; set => name = value; }
 }

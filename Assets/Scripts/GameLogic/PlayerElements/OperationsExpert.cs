@@ -17,7 +17,7 @@ public class OperationsExpert : Role
     }
 
     public override bool nonStandardMove(Player player, Location loc){
-        if(player.getLocation().getResearchStationStatus() && player.getHandWithoutEvents().Count > 0 && !usedThisRound){
+        if(player.CurLoc.ResearchStationStatus && player.getHandWithoutEvents().Count > 0 && !usedThisRound){
             usedThisRound = true;
             return true;
         }

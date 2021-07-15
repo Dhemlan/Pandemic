@@ -8,10 +8,10 @@ public class PlayerCard : Card, IComparable<PlayerCard>
     private bool removeAfterPlayed = false;
 
     public PlayerCard(Location loc, int id, string name){
-        this.loc = loc;
+        this.Location = loc;
         this.id = id;
-        this.name = name;
-        if (loc != null) colour = loc.getColour();
+        this.Name = name;
+        if (loc != null) colour = loc.Colour;
         else{
             if (id == Vals.EPIDEMIC){
                 colour = Vals.Colour.EPIDEMIC;
@@ -23,7 +23,7 @@ public class PlayerCard : Card, IComparable<PlayerCard>
     }
 
     public int CompareTo(PlayerCard o){
-        if(colour > o.getColour()){
+        if(colour > o.Colour){
             return -1;
         }
         else return 1;

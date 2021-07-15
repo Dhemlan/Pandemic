@@ -17,11 +17,11 @@ public class SelectablePlayer : MonoBehaviour, ISelectable<Player>
 
     public void populateItemData(Player player){
         this.player = player;
-        label.text = player.getRole().getName();
+        label.text = player.getRole().Name;
     }
 
    public Sprite getSprite(){
-       return sprites[player.getRole().getID()];
+       return sprites[player.getRole().ID];
    }
 
    public bool isSelected(){

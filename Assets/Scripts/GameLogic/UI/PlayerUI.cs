@@ -13,6 +13,8 @@ public class PlayerUI : MonoBehaviour
     public Sprite[] actionIconSprites;
     public Text actionsCountText;
 
+    public GameObject undoButton;
+
     public void preparePlayerUIObjects(List<GameObject> players){
         foreach (GameObject player in players){
             // Gather active hand resources
@@ -35,15 +37,15 @@ public class PlayerUI : MonoBehaviour
             player.transform.Find("PlayerName").GetComponent<Text>().text = Vals.ROLES[role];
             GameObject boardPawn = playerScript.getBoardPawn();
             boardPawn.GetComponent<SpriteRenderer>().sprite = pawnSprites[role];
-            updatePawns(playerScript.getLocation());
+            updatePawns(playerScript.CurLoc);
         }
     }
 
     public void updateHand(Player player, List<PlayerCard> hand){
         int i = 0;
         foreach (PlayerCard card in hand){
-            playerHandCardNames[player.turnOrderPos - 1][i].text = card.getName();
-            playerHandIcons[player.turnOrderPos - 1][i].sprite = diseaseIconSprites[(int)card.getColour()];
+            playerHandCardNames[player.turnOrderPos - 1][i].text = card.Name;
+            playerHandIcons[player.turnOrderPos - 1][i].sprite = diseaseIconSprites[(int)card.Colour];
             i++;
         }
         for (; i < Vals.MAX_HAND_SIZE; i++){
@@ -53,7 +55,7 @@ public class PlayerUI : MonoBehaviour
     }
 
     public void updatePawns(Location loc){
-        List<Player> localPlayers = loc.getLocalPlayers();
+        List<Player> localPlayers = loc.LocalPlayers;
         float x = -.5f;
         switch (localPlayers.Count){
             case 1:   
@@ -90,13 +92,12 @@ public class PlayerUI : MonoBehaviour
     }
 
     public void placePawn(Player player){
-        List<Player> localPlayers = player.getLocation().getLocalPlayers();
-        Debug.Log("local players: " + localPlayers.Count);
-        if (player.getLocation().getLocalPlayers().Count > 1){
-            updatePawns(player.getLocation());
+        List<Player> localPlayers = player.CurLoc.LocalPlayers;
+        if (localPlayers.Count > 1){
+            updatePawns(player.CurLoc);
         }
         else{
-            player.getBoardPawn().transform.position = player.getLocation().transform.position;
+            player.getBoardPawn().transform.position = player.CurLoc.transform.position;
         } 
         
     }
@@ -106,7 +107,12 @@ public class PlayerUI : MonoBehaviour
     }
 
     public void toggleCurPlayer(Player player){
+
         Image curPlayerIndicator = player.transform.GetComponentInChildren<Image>();
         curPlayerIndicator.enabled = !curPlayerIndicator.enabled;
+    }
+
+    public void toggleUndoActive(bool value){
+        undoButton.SetActive(value);
     }
 }

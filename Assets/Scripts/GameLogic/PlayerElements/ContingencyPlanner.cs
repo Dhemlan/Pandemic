@@ -16,7 +16,7 @@ public class ContingencyPlanner : Role
         if (storedEventCard == null){
             storedEventCard = (PlayerCard)(object)eventCardToStore;
             storedEventCard.removeAfterPlaying();
-            Debug.Log(storedEventCard.getName() + "retrieved");
+            Debug.Log(storedEventCard.Name + "retrieved");
         }
         yield break;
     }
@@ -28,6 +28,10 @@ public class ContingencyPlanner : Role
     public void storedEventCardPlayed(){
         storedEventCard = null;
     }
+
+    public PlayerCard StoredEventCard { get => storedEventCard; set => storedEventCard = value; }
+
+    
 
 
 

@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 public class Board : MonoBehaviour
 {
     public BoardUI boardUI;
-    public CardUI cardUI;
     public OverlayUI overlayUI;
     public GameFlowManager gameFlowManager;
     public PlayerManager playerManager;
+    public InteractablesManager interactablesManager;
+    public OutbreakHandler outbreakHandler;
     
     private Stack<InfectionCard> infectionDeck = new Stack<InfectionCard>();
     private List<InfectionCard> infectionDiscardPile = new List<InfectionCard>();
@@ -18,102 +20,28 @@ public class Board : MonoBehaviour
     private Stack<PlayerCard> playerDeck = new Stack<PlayerCard>();
     private List<PlayerCard> playerDiscardPile = new List<PlayerCard>();
     private List<PlayerCard> availableEventCards = new List<PlayerCard>();
-     
-    private List<Location> outbreakCitiesThisMove = new List<Location>();
-    private Queue<Location> outbreaksToResolve = new Queue<Location>();
 
-    private int infectionRateTrackIndex = 0;
     private int[] infectionRateTrack = Vals.INFECTION_RATE_TRACK;
+    private int epidemicCardCount;
+    private bool gameOver = false;
+    
+    private int infectionRateTrackIndex = 0;
     private int outbreakCount = 0;
     private int[] diseaseCubeSupply = new int[] {Vals.INITIAL_DISEASE_CUBE_COUNT,Vals.INITIAL_DISEASE_CUBE_COUNT,Vals.INITIAL_DISEASE_CUBE_COUNT,Vals.INITIAL_DISEASE_CUBE_COUNT};
-    private int[] cardsToCure = new int[] {Vals.DEFAULT_CARDS_TO_CURE, Vals.DEFAULT_CARDS_TO_CURE, Vals.DEFAULT_CARDS_TO_CURE, Vals.DEFAULT_CARDS_TO_CURE};
     private int[] diseaseStatus = new int[] {Vals.DISEASE_UNCURED,Vals.DISEASE_UNCURED,Vals.DISEASE_UNCURED,Vals.DISEASE_UNCURED};
     private int researchStationSupply = Vals.DEFAULT_RESEARCH_STATION_SUPPLY;
 
     public IEnumerator boardSetUp(int epidemicCardCount){
+        this.epidemicCardCount = epidemicCardCount;
         BoardGenerator generator = gameObject.GetComponent<BoardGenerator>();
-        yield return StartCoroutine(generator.generateBoard(this, infectionDeck, epidemicInfectionCards, epidemicCardCount));
-        yield return StartCoroutine(infectCities());
+        yield return StartCoroutine(generator.generateBoard());
+        
+        //yield return StartCoroutine(infectCities());
         playerManager.generateCharacters(3);
-        generator.preparePlayerCards(playerDeck, playerManager, availableEventCards);
-        boardUI.boardSetUp(playerDeck.Count);
+        generator.preparePlayerCards();
+        boardUI.boardSetUp(PlayerDeck.Count);
         overlayUI.gatherColliders(GetComponentsInChildren<CircleCollider2D>(), GetComponentsInChildren<BoxCollider2D>());
         yield break;
-    }
-
-    public IEnumerator drawPhase(){
-        List<PlayerCard> drawnCards = new List<PlayerCard>();
-            try {
-                drawnCards.Add(playerDeck.Pop()); 
-                drawnCards.Add(playerDeck.Pop());
-            }
-            catch(InvalidOperationException){
-                StartCoroutine(gameFlowManager.gameOver(Vals.GameOver.CARDS));
-            } 
-            boardUI.setPlayerDeckCount(playerDeck.Count);                   
-            yield return StartCoroutine(cardUI.playerDraw(playerManager.getCurPlayer(), drawnCards[0], drawnCards[1]));
-            
-            foreach (PlayerCard drawn in drawnCards){
-                Debug.Log("Player draws " + drawn.getName());
-                if(drawn.getID() == Vals.EPIDEMIC){
-                    // Increase Step
-                    infectionRateTrackIndex++;
-                    
-                    boardUI.advanceInfectionRateTrack();
-                    // Infect Step
-                    InfectionCard epidemicDrawn = epidemicInfectionCards.Pop();
-                    Location loc = epidemicDrawn.getLocation();
-                    infectionDiscardPile.Add(epidemicDrawn);
-                    yield return StartCoroutine(cardUI.infectionDraw(loc.getName(), loc.getColour()));
-                    if (diseaseStatus[(int)loc.getColour()] < Vals.DISEASE_ERADICATED){
-                        for (int j = 0; j < Vals.CUBES_PER_EPIDEMIC_INFECT; j++){
-                            yield return StartCoroutine(addCube(loc, loc.getColour()));
-                        }
-                    }
-                    outbreakCitiesThisMove.Clear();
-                    //Intensify Step
-                    if (specificEventAvailable("intensify")){
-                        requestUserAcceptContinue(Strings.CONTINUE_INTENSIFY);
-                        yield return new WaitUntil(() => Vals.continueGameFlow);
-                    }
-                    Utils.ShuffleAndPlaceOnTop(infectionDiscardPile, infectionDeck);
-                }
-                else {
-                    if (drawn.getColour() == Vals.Colour.EVENT){
-                        availableEventCards.Add(drawn);
-                    }
-                    playerManager.drawPhaseAdd(drawn);
-                }
-            }
-            yield return StartCoroutine(playerManager.checkHandLimit(playerManager.getCurPlayer()));
-    }
-
-    public IEnumerator infectionPhase(){
-        if (Vals.oneQuietNightActive){    
-            Vals.oneQuietNightActive = false;
-            yield break;
-        }
-        else{   
-            for (int i = 0; i < infectionRateTrack[infectionRateTrackIndex]; i++){
-                if (specificEventAvailable("infection")){
-                    requestUserAcceptContinue(Strings.CONTINUE_INFECTION_PHASE);
-                    yield return new WaitUntil(() => Vals.continueGameFlow);
-                    if (Vals.oneQuietNightActive){
-                        Vals.oneQuietNightActive = false;
-                        yield break;
-                    }
-                }
-                outbreakCitiesThisMove.Clear();
-                InfectionCard drawn = infectionDeck.Pop(); 
-                Debug.Log("Infection: " + drawn.getName());
-                Location loc = drawn.getLocation();
-                infectionDiscardPile.Add(drawn);
-                yield return StartCoroutine(cardUI.infectionDraw(drawn.getName(), loc.getColour()));
-                if (diseaseStatus[(int)loc.getColour()] < Vals.DISEASE_ERADICATED){
-                    yield return StartCoroutine(addCube(loc, loc.getColour()));
-                }   
-            }
-        }
     }
 
     public void requestUserAcceptContinue(string message){
@@ -121,43 +49,45 @@ public class Board : MonoBehaviour
         overlayUI.requestPlayerContinue(message);
     }
 
+    public IEnumerator addCube(InfectionCard card){
+        Location loc = card.Location;
+        yield return StartCoroutine(addCube(loc, loc.Colour));
+    }
+
     public IEnumerator addCube(Location loc, Vals.Colour colour){
         if(loc.specificRoleHere(Vals.QUARANTINE_SPECIALIST) || (loc.specificRoleHere(Vals.MEDIC) && isDiseaseCured(colour))){
             yield break;
         }
-        foreach(Location neighbour in loc.getNeighbours()){
+        foreach(Location neighbour in loc.Neighbours){
             if(neighbour.specificRoleHere(Vals.QUARANTINE_SPECIALIST)){
                 yield break;
             }
         }
-
-        if (loc.checkOutbreak(colour)){
-            yield return StartCoroutine(outbreakOccurs(loc, colour));
-            Debug.Log("Outbreak identified - cube not added");
-        }
-        else {
-            loc.addCube(colour);
-            Debug.Log("Adding cube in " + loc.getName());
-            diseaseCubeSupply[(int)colour]--;
-            boardUI.setCubeCount(colour, diseaseCubeSupply[(int)colour]);
-            
-            if (diseaseCubeSupply[(int)colour] == 0){
-                Debug.Log("out of " + colour);
-                yield return StartCoroutine(gameFlowManager.gameOver(Vals.GameOver.CUBES));       
+        yield return StartCoroutine(outbreakHandler.checkForOutbreak(loc, colour, (outbreakOccurs) =>{
+            if(!outbreakOccurs){
+                if (DiseaseCubeSupply[(int)colour] == 0){
+                   gameOver = true;       
+                }
+                else{
+                    loc.addCube(colour);
+                    Debug.Log("Adding cube in " + loc.retrieveLocName());
+                    DiseaseCubeSupply[(int)colour]--;
+                    boardUI.setCubeCount(colour, DiseaseCubeSupply[(int)colour]);
+                    boardUI.addCube(loc, colour);
+                }
             }
-            yield return StartCoroutine(boardUI.addCube(loc, colour));
-        }
-        yield break;
+        }));
+        if (gameOver) yield return StartCoroutine(gameFlowManager.gameOver(Vals.GameOver.CUBES));
     }
 
     public bool removeCube(Location loc, Vals.Colour colour){
         if (loc.removeCube(colour)){
-            diseaseCubeSupply[(int)colour]++;
-            if(diseaseStatus[(int)colour] == Vals.DISEASE_CURED && diseaseCubeSupply[(int)colour] == Vals.INITIAL_DISEASE_CUBE_COUNT){
+            DiseaseCubeSupply[(int)colour]++;
+            if(DiseaseStatus[(int)colour] == Vals.DISEASE_CURED && DiseaseCubeSupply[(int)colour] == Vals.INITIAL_DISEASE_CUBE_COUNT){
                 eradicateDisease(colour);
             }
-            Debug.Log("Removing cube in " + loc.getName());
-            boardUI.setCubeCount(colour, diseaseCubeSupply[(int)colour]);
+            Debug.Log("Removing cube in " + loc.retrieveLocName());
+            boardUI.setCubeCount(colour, DiseaseCubeSupply[(int)colour]);
             boardUI.removeCube(loc, colour);
             return true;
         }
@@ -168,36 +98,15 @@ public class Board : MonoBehaviour
     public void removeCubes(Location loc, Vals.Colour colour){
         while (removeCube(loc, colour)){};
     }
-    
-    public IEnumerator outbreakOccurs(Location loc, Vals.Colour cubeColour){
-        if (!outbreakCitiesThisMove.Contains(loc)){
-            outbreakCount++;
-            Debug.Log("Outbreak #" + outbreakCount + " in " + loc.getName());
-            boardUI.increaseOutbreakCounter(outbreakCount);
-            if (outbreakCount == Vals.OUTBREAK_COUNT_LIMIT) {
-                yield return StartCoroutine(gameFlowManager.gameOver(Vals.GameOver.OUTBREAKS));         
-            }
-            outbreakCitiesThisMove.Add(loc);
-            foreach (Location neighbour in loc.getNeighbours()){
-                yield return StartCoroutine(addCube(neighbour, cubeColour));
-                Debug.Log("Request to add cube in " + neighbour.getName());
-            }
-        }
-        yield break;
-    }
-
-    public int[] retrieveCureRequirements(){
-        return cardsToCure;
-    }
 
     public IEnumerator cure(int numberOfCardsRequired, Player player, Vals.Colour colourToDiscard){
         List<PlayerCard> discarded = new List<PlayerCard>();
         string message = Strings.DISCARD_PREFIX + numberOfCardsRequired + Strings.DISCARD_SUFFIX;
         yield return StartCoroutine(overlayUI.requestMultiSelect(player.getHand(), discarded, Vals.SELECTABLE_PLAYER_CARD, numberOfCardsRequired, colourToDiscard, message));
-        diseaseStatus[(int)colourToDiscard] = Vals.DISEASE_CURED;
-        boardUI.diseaseCured(colourToDiscard);
+        DiseaseStatus[(int)colourToDiscard] = Vals.DISEASE_CURED;
+        boardUI.updateDiseaseStatus(colourToDiscard, Vals.DISEASE_CURED);
         playerManager.cureOccurs(colourToDiscard);
-        if(diseaseCubeSupply[(int)colourToDiscard] == Vals.INITIAL_DISEASE_CUBE_COUNT){
+        if(DiseaseCubeSupply[(int)colourToDiscard] == Vals.INITIAL_DISEASE_CUBE_COUNT){
             eradicateDisease(colourToDiscard);
         }
         playerManager.discardCards(player, discarded);
@@ -207,73 +116,56 @@ public class Board : MonoBehaviour
     }
 
     public void discardCard(PlayerCard card){
-        playerDiscardPile.Add(card);
+        PlayerDiscardPile.Add(card);
     }
 
     public void displayPlayerDiscard(){
-        if (playerDiscardPile.Count == 0) StartCoroutine(overlayUI.displayToast(Strings.PLAYER_DISCARD_EMPTY, true));
-        else StartCoroutine(overlayUI.displayItemsUntilClosed(playerDiscardPile, Vals.PLAYER_CARD, Strings.PLAYER_DISCARD));
+        if (PlayerDiscardPile.Count == 0) StartCoroutine(overlayUI.displayToast(Strings.PLAYER_DISCARD_EMPTY, true));
+        else StartCoroutine(overlayUI.displayItemsUntilClosed(PlayerDiscardPile, Vals.PLAYER_CARD, Strings.PLAYER_DISCARD));
     }
 
     public void displayInfectionDiscard(){
-        if (infectionDiscardPile.Count == 0) StartCoroutine(overlayUI.displayToast(Strings.INFECTION_DISCARD_EMPTY, true));
-        else StartCoroutine(overlayUI.displayItemsUntilClosed(infectionDiscardPile, Vals.INFECTION_CARD, Strings.INFECTION_DISCARD));
+        if (InfectionDiscardPile.Count == 0) StartCoroutine(overlayUI.displayToast(Strings.INFECTION_DISCARD_EMPTY, true));
+        else StartCoroutine(overlayUI.displayItemsUntilClosed(InfectionDiscardPile, Vals.INFECTION_CARD, Strings.INFECTION_DISCARD));
     }
 
     public void displayAvailableEvents(){
-        if (availableEventCards.Count == 0) StartCoroutine(overlayUI.displayToast(Strings.AVAILABLE_EVENTS_EMPTY, true));
-        else StartCoroutine(overlayUI.displayItemsUntilClosed(availableEventCards, Vals.EVENT_CARD, Strings.AVAILABLE_EVENTS));
-    }
-
-    public IEnumerator infectCities(){
-        for (int i = Vals.INITIAL_INFECTION_ROUNDS; i > 0; i--){
-            for (int j = 0; j < Vals.CARDS_PER_INITIAL_INFECTION_ROUND; j++){
-                InfectionCard drawn = infectionDeck.Pop();
-                Location loc = drawn.getLocation();
-                infectionDiscardPile.Add(drawn);
-                //yield return StartCoroutine(cardUI.infectionDraw(drawn.getName(), loc.getColour()));
-                
-                Debug.Log("Initial infection in " + drawn.getName());
-                for (int k = 0; k < i; k++){          
-                    yield return StartCoroutine(addCube(loc, loc.getColour()));
-                }             
-            }
-        }
+        if (AvailableEventCards.Count == 0) StartCoroutine(overlayUI.displayToast(Strings.AVAILABLE_EVENTS_EMPTY, true));
+        else StartCoroutine(overlayUI.displayItemsUntilClosed(AvailableEventCards, Vals.EVENT_CARD, Strings.AVAILABLE_EVENTS));
     }
 
     public bool isDiseaseCured(Vals.Colour colour){
-        Debug.Log("checking disease " + (int)colour);
-        return diseaseStatus[(int)colour] > 0 ? true : false;
+        return DiseaseStatus[(int)colour] > 0 ? true : false;
     }
 
     public IEnumerator buildResearchStation(Location loc){
-        if (researchStationSupply == 0){
-            Debug.Log("Remove a station");
-            Vals.removeResearchStation = true;
-            yield return new WaitUntil(() => !Vals.removeResearchStation);  
-            //boardUI.toggleResearchStation()
-            researchStationSupply++;
-
+        if (ResearchStationSupply == 0){
+            yield return StartCoroutine(removeResearchStation());
         }
         loc.buildResearchStation();
         boardUI.toggleResearchStation(loc);
-        researchStationSupply--;
-        Debug.Log("research stations in supply "  + researchStationSupply);
+        ResearchStationSupply--;
+        Debug.Log("research stations in supply "  + ResearchStationSupply);
         yield break;
+    }
+
+    public IEnumerator removeResearchStation(){
+        Debug.Log("Remove a station");
+        StartCoroutine(overlayUI.displayToast(Strings.REPLACE_RESEARCH_STATION, true));
+        Vals.removeResearchStation = true;
+        yield return new WaitUntil(() => !Vals.removeResearchStation);  
+        //boardUI.toggleResearchStation()
+        ResearchStationSupply++;
     }
 
     public void promptDrawPhase(){
         boardUI.activateDrawButton();
     }
 
-    public void eventCardDrawn(PlayerCard card){
-        availableEventCards.Add(card);
-    }
-
     public void eventCardPlayed(PlayerCard eventCard){
-        availableEventCards.Remove(eventCard);
+        AvailableEventCards.Remove(eventCard);
         if (!eventCard.getRemoveAfterPlaying()){
-            playerDiscardPile.Add(eventCard);
+            PlayerDiscardPile.Add(eventCard);
         }
         if(!playerManager.removeCardFromHand(eventCard, false)){
             playerManager.storedEventCardPlayed();
@@ -281,13 +173,13 @@ public class Board : MonoBehaviour
     }
 
     private void eradicateDisease(Vals.Colour colour){
-        diseaseStatus[(int)colour] = Vals.DISEASE_ERADICATED;
-        boardUI.diseaseEradicated(colour);
+        DiseaseStatus[(int)colour] = Vals.DISEASE_ERADICATED;
+        boardUI.updateDiseaseStatus(colour, Vals.DISEASE_ERADICATED);
     }
 
     private IEnumerator checkCureVictoryCondition(){
-        for (int i = 0; i < diseaseStatus.Length; i++){
-            if(diseaseStatus[i] == Vals.DISEASE_UNCURED){
+        for (int i = 0; i < DiseaseStatus.Length; i++){
+            if(DiseaseStatus[i] == Vals.DISEASE_UNCURED){
                 yield break;
             }
         }
@@ -295,17 +187,13 @@ public class Board : MonoBehaviour
     }
 
     public void removeInfectionCardFromDiscard(InfectionCard toRemove){
-        infectionDiscardPile.Remove(toRemove);
-    }
-
-    public List<InfectionCard> getInfectionDiscardPile(){
-        return infectionDiscardPile;
+        InfectionDiscardPile.Remove(toRemove);
     }
 
     public List<PlayerCard> getEventsInDiscard(){
         List<PlayerCard> playerCards = new List<PlayerCard>();
-        foreach(PlayerCard card in playerDiscardPile){
-            if (card.getColour() == Vals.Colour.EVENT){
+        foreach(PlayerCard card in PlayerDiscardPile){
+            if (card.Colour == Vals.Colour.EVENT){
                 playerCards.Add(card);
             }
         }
@@ -313,11 +201,7 @@ public class Board : MonoBehaviour
     }
 
     public void removePlayerCardFromDiscard(PlayerCard toRemove){
-        playerDiscardPile.Remove(toRemove);
-    }
-
-    public Stack<InfectionCard> getInfectionDeck(){
-        return infectionDeck;
+        PlayerDiscardPile.Remove(toRemove);
     }
 
     public bool specificEventAvailable(string timing){
@@ -336,10 +220,72 @@ public class Board : MonoBehaviour
                 eventIDs.Add(Vals.FORECAST);
                 break;
         }
-        foreach(PlayerCard card in availableEventCards){
-            if (eventIDs.Contains(card.getID())) return true;
+        foreach(PlayerCard card in AvailableEventCards){
+            if (eventIDs.Contains(card.ID)) return true;
         }
         return false;
     }
 
+    public void reloadBoard(){
+        boardUI.updateDiseaseCubeSupply(diseaseCubeSupply);
+        for(int i = 0; i < diseaseStatus.Length; i++){
+            boardUI.updateDiseaseStatus((Vals.Colour)i, diseaseStatus[i]);
+        }
+        foreach (Location loc in GameObject.Find("Locations").GetComponentsInChildren<Location>()){
+            boardUI.toggleResearchStation(loc);
+            boardUI.updateCubes(loc);
+        }
+    }
+
+    public InfectionCard drawInfectionCard(){
+        return infectionDeck.Pop();
+    }
+
+    public InfectionCard drawInfectionCardFromBottom(){
+        return epidemicInfectionCards.Pop();
+    }
+
+    public void discardInfectionCard(InfectionCard card){
+        infectionDiscardPile.Add(card);
+    }
+
+    public PlayerCard drawPlayerCard(){
+        try {
+            return playerDeck.Pop();
+        }
+        catch(InvalidOperationException){
+            StartCoroutine(gameFlowManager.gameOver(Vals.GameOver.CARDS));
+            return null;
+        }
+    }
+
+    public void eventCardDrawn(PlayerCard eventCard){
+        availableEventCards.Add(eventCard);
+    }
+
+    public void intensifyEpidemicStep(){
+        Utils.ShuffleAndPlaceOnTop(InfectionDiscardPile, InfectionDeck);
+    }
+
+    public bool isEradicated(Vals.Colour colour){
+        return (diseaseStatus[(int)colour] < Vals.DISEASE_ERADICATED) ? false : true;
+    }
+
+    public int currentInfectionRate(){
+        return infectionRateTrack[infectionRateTrackIndex];
+    }
+
+    public int InfectionRateTrackIndex { get => infectionRateTrackIndex; set => infectionRateTrackIndex = value; }
+    public int OutbreakCount { get => outbreakCount; set => outbreakCount = value; }
+    public int[] DiseaseCubeSupply { get => diseaseCubeSupply; set => diseaseCubeSupply = value; }
+    public int[] DiseaseStatus { get => diseaseStatus; set => diseaseStatus = value; }
+    public int ResearchStationSupply { get => researchStationSupply; set => researchStationSupply = value; }
+    public List<PlayerCard> PlayerDiscardPile { get => playerDiscardPile; set => playerDiscardPile = value; }
+    public List<InfectionCard> InfectionDiscardPile { get => infectionDiscardPile; set => infectionDiscardPile = value; }
+    public List<PlayerCard> AvailableEventCards { get => AvailableEventCards1; set => AvailableEventCards1 = value; }
+    public int EpidemicCardCount { get => epidemicCardCount; set => epidemicCardCount = value; }
+    public Stack<InfectionCard> InfectionDeck { get => infectionDeck; set => infectionDeck = value; }
+    public Stack<InfectionCard> EpidemicInfectionCards { get => epidemicInfectionCards; set => epidemicInfectionCards = value; }
+    public Stack<PlayerCard> PlayerDeck { get => playerDeck; set => playerDeck = value; }
+    public List<PlayerCard> AvailableEventCards1 { get => availableEventCards; set => availableEventCards = value; }
 }

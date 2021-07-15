@@ -5,24 +5,54 @@ using UnityEngine.EventSystems;
 
 public class Location : MonoBehaviour
 {
-    public ActionManager actionManager;
     public Vals.Colour colour;
-    int[] diseaseCubes = {0,0,0,0};
     public List<Location> neighbours = new List<Location>();
     private List<Player> localPlayers = new List<Player>();
-
-    private bool researchStation = false;
-
-    public void OnMouseDown(){
-        StartCoroutine(actionManager.handleLocClick(this));
-    }
+    private int id;
+    private int[] diseaseCubes = {0,0,0,0};
+    private bool researchStationStatus = false;
 
     public void addCube(Vals.Colour colour){  
-        diseaseCubes[(int)colour]++;
+        DiseaseCubes[(int)colour]++;
     }
 
+    public bool removeCube(Vals.Colour colourToTreat){
+        if (DiseaseCubes[(int)colourToTreat] == 0){
+            return false;
+        } 
+        DiseaseCubes[(int)colourToTreat]--;
+        return true;
+    }
+
+    public List<Vals.Colour> diseasesActiveHere(){
+        List<Vals.Colour> activeDiseases = new List<Vals.Colour>();
+        for (int i = 0; i < DiseaseCubes.Length; i++){
+            if (DiseaseCubes[i] > 0){
+                activeDiseases.Add((Vals.Colour)i);
+            }
+        }
+        return activeDiseases;
+    } 
+
+    public int getDiseaseCubeCount(Vals.Colour colour){
+        return diseaseCubes[(int)colour];
+    }
+
+    public string retrieveLocName(){
+        return gameObject.name;
+    }
+
+    public void buildResearchStation(){
+        researchStationStatus = true;
+        Debug.Log("Building research station" + gameObject.name);
+    }
+
+    public void removeResearchStation(){
+        researchStationStatus = false;
+    }
+    
     public bool specificRoleHere(int roleID){
-        foreach (Player player in localPlayers){
+        foreach (Player player in LocalPlayers){
             if (player.getRoleID() == roleID){
                 return true;
             }
@@ -30,71 +60,22 @@ public class Location : MonoBehaviour
         return false;
     }
 
-    public bool removeCube(Vals.Colour colourToTreat){
-        if (diseaseCubes[(int)colourToTreat] == 0){
-            return false;
-        } 
-        diseaseCubes[(int)colourToTreat]--;
-        return true;
-    }
-
-    public bool checkOutbreak(Vals.Colour colour){
-        if (diseaseCubes[(int)colour] == Vals.OUTBREAK_THRESHOLD){
-            return true;
-        }
-        return false;
-    }
-
-    public string getName(){
-        return gameObject.name;
-    }
-
-    public Vals.Colour getColour(){
-        return colour;
-    }
-
-    public void buildResearchStation(){
-        researchStation = true;
-        Debug.Log("Building research station" + gameObject.name);
-    }
-
-    public void removeResearchStation(){
-        researchStation = false;
-    }
-
-    public bool getResearchStationStatus(){
-        return researchStation;
-    }
-
-    public List<Location> getNeighbours(){
-        return neighbours;
-    }
-
     public bool hasNeighbour (Location loc){
-        return neighbours.Contains(loc);
+        return Neighbours.Contains(loc);
     }
     
     public void playerEnters(Player player){
-        localPlayers.Add(player);
-        Debug.Log(player.getTurnOrderPos() + " enters " + name + ": " + localPlayers.Count + " are here");
+        LocalPlayers.Add(player);
     }
 
     public void playerLeaves(Player player){
-        localPlayers.Remove(player);
-        Debug.Log(player.getTurnOrderPos() + " leaves " + name + ": " + localPlayers.Count + " remain");
-    }
-
-    public List<Player> getLocalPlayers(){
-        return localPlayers;
+        LocalPlayers.Remove(player);
     }
     
-    public List<Vals.Colour> diseasesActiveHere(){
-        List<Vals.Colour> activeDiseases = new List<Vals.Colour>();
-        for (int i = 0; i < diseaseCubes.Length; i++){
-            if (diseaseCubes[i] > 0){
-                activeDiseases.Add((Vals.Colour)i);
-            }
-        }
-        return activeDiseases;
-    } 
+    public int[] DiseaseCubes { get => diseaseCubes; set => diseaseCubes = value; }
+    public int Id { get => id; set => id = value; }
+    public bool ResearchStationStatus { get => researchStationStatus; set => researchStationStatus = value; }
+    public List<Player> LocalPlayers { get => localPlayers; set => localPlayers = value; }
+    public Vals.Colour Colour { get => colour; set => colour = value; }
+    public List<Location> Neighbours { get => neighbours; set => neighbours = value; }
 }

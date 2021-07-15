@@ -6,7 +6,9 @@ public class DiseaseCubeRotator : MonoBehaviour
 {   
     private int speed = 45;
     private Vals.Colour colour;
-    
+
+    public Vals.Colour Colour { get => colour; set => colour = value; }
+
     void Update()
     {
         transform.Rotate(new Vector3(0,0, 75 + speed / 3) * Time.deltaTime);
@@ -17,13 +19,5 @@ public class DiseaseCubeRotator : MonoBehaviour
         int speedFactor = 45;
         if (urgency > 2) speed = speedFactor * 3;
         else speed = speedFactor * urgency;
-    }
-
-    public void setColour(Vals.Colour colour){
-        this.colour = colour;
-    }
-
-    public Vals.Colour getColour(){
-        return colour;
     }
 }

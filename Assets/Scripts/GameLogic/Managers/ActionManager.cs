@@ -18,9 +18,8 @@ public class ActionManager : MonoBehaviour
     public event TreatEventHandler treatActionClicked;
     
     public IEnumerator handleLocClick(Location loc){
-
         if (Vals.removeResearchStation){
-            if(loc.getResearchStationStatus()){
+            if(loc.ResearchStationStatus){
                 loc.removeResearchStation();
                 boardUI.toggleResearchStation(loc);
                 Vals.removeResearchStation = false;
@@ -32,19 +31,19 @@ public class ActionManager : MonoBehaviour
             Vals.continueGameFlow = true;
         }
         else if(Vals.cardResolving == Vals.GOVERNMENT_GRANT){
-            if (!loc.getResearchStationStatus()){
+            if (!loc.ResearchStationStatus){
                 yield return StartCoroutine(board.buildResearchStation(loc));
                 Vals.cardResolving = -1;
                 Vals.continueGameFlow = true;
             }
         }
         else if (gameFlowManager.getPhase() == Vals.Phase.ACTION && playerManager.actionAvailable()){
-            Debug.Log(loc.getName() + " clicked");
+            Debug.Log(loc.retrieveLocName() + " clicked");
             Player player = playerManager.getCurPlayer();
             if (player.getRoleID() == Vals.DISPATCHER && playerManager.getUserSelectedPlayer() != null){
                 StartCoroutine(playerManager.potentialPlayerMovement(player, loc));
             }
-            else if (player.getLocation().Equals(loc)){
+            else if (player.CurLoc.Equals(loc)){
                StartCoroutine(handleTreatAction(player, loc)); 
             }
             else {
@@ -84,7 +83,7 @@ public class ActionManager : MonoBehaviour
                     Debug.Log("Move");     
                     break;
                 case "TreatAction":
-                    StartCoroutine(handleTreatAction(actionTaker, actionTaker.getLocation()));
+                    StartCoroutine(handleTreatAction(actionTaker, actionTaker.CurLoc));
                     break;
                 case "ShareAction":
                     Debug.Log("share");
@@ -97,9 +96,9 @@ public class ActionManager : MonoBehaviour
                     break;
                 case "CureAction":
                     Debug.Log("Cure");
-                    Nullable<Vals.Colour> colourToDiscard = actionTaker.determineCureActionAvailable(board.retrieveCureRequirements(), actionTaker.getLocation().getResearchStationStatus());    
+                    Nullable<Vals.Colour> colourToDiscard = actionTaker.determineCureActionAvailable(actionTaker.CurLoc.ResearchStationStatus);    
                     if (colourToDiscard != null){
-                        int cardsToDiscard = actionTaker.roleModifiedCardsToCure(board.retrieveCureRequirements()[(int)colourToDiscard]);
+                        int cardsToDiscard = actionTaker.roleModifiedCardsToCure(Vals.DEFAULT_CARDS_TO_CURE);
                         StartCoroutine(board.cure(cardsToDiscard, actionTaker, colourToDiscard.Value));
                     }
                     break;

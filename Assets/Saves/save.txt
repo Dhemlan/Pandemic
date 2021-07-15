@@ -1,0 +1,1 @@
+{"diseaseCubeSupply":[21,22,14,21],"diseaseStatus":[0,0,0,0],"infectionRate":0,"outbreaks":0,"researchStationSupply":5,"serializableLocations":[{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]}

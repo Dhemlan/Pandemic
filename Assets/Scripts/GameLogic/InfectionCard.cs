@@ -6,10 +6,10 @@ public class InfectionCard : Card
 {
 
     public InfectionCard(Location loc, int id, string name){
-        this.loc = loc;
+        this.Location = loc;
         this.id = id;
         this.name = name;
-        if (loc != null) colour = loc.getColour();
+        if (loc != null) colour = loc.Colour;
         else{
             if (id == Vals.EPIDEMIC){
                 colour = Vals.Colour.EPIDEMIC;

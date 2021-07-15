@@ -33,7 +33,9 @@ public class Vals
     // Set-up
     public const int BASE_INFECTION_RATE = 2;
     public const int OUTBREAK_COUNT_LIMIT = 8;
-    public const int INITIAL_INFECTION_ROUNDS = 3;
+    public const int INITIAL_INFECTION_FIRST_PHASE = 3;
+    public const int INITIAL_INFECTION_SECOND_PHASE = 2;
+    public const int INITIAL_INFECTION_THIRD_PHASE = 1;
     public const int CARDS_PER_INITIAL_INFECTION_ROUND = 3; 
     public const int INITIAL_DISEASE_CUBE_COUNT = 24;
     public const int DISEASE_COUNT = 4;
@@ -46,6 +48,8 @@ public class Vals
     // Misc numbers
     public const int OUTBREAK_THRESHOLD = 3;
     public const int CUBES_PER_EPIDEMIC_INFECT = 3;
+    public const int CUBES_PER_INFECTION_DRAW = 1;
+    public const int DRAW_PHASE_CARD_DRAW_COUNT = 2;
 
     public const int DISEASE_UNCURED = 0;
     public const int DISEASE_CURED = 1;
@@ -62,6 +66,7 @@ public class Vals
     public static int cardResolving = -1;
     public const int MAX_HAND_SIZE = 10;
     public const float GENERIC_WAIT_TIME = 0.75f;
+    public const float CUBE_WAIT_TIME = 0.3f;
     
 
     public const int SELECTABLE_PLAYER_CARD = 0;

@@ -23,7 +23,7 @@ public class MultiSelectableInfectionCard : MonoBehaviour, ISelectable<Infection
     
     public void populateItemData(InfectionCard card){
         this.card = card;
-        label.text = card.getName();
+        label.text = card.Name;
     }
 
     public InfectionCard getSelectedValue(){
@@ -31,7 +31,7 @@ public class MultiSelectableInfectionCard : MonoBehaviour, ISelectable<Infection
     }
 
     public Sprite getSprite(){
-        return sprites[(int)card.getColour()];
+        return sprites[(int)card.Colour];
     }
 
     public bool isSelected(){

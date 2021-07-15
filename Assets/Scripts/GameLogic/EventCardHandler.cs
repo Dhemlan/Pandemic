@@ -7,6 +7,7 @@ public class EventCardHandler : MonoBehaviour
     public Board board;
     public OverlayUI overlayUI;
     public PlayerManager playerManager;
+    public UndoObject undoObject;
     private List<InfectionCard> clickedCards = new List<InfectionCard>();
 
 
@@ -18,7 +19,7 @@ public class EventCardHandler : MonoBehaviour
         //overlayUI.StopAllCoroutines();
         overlayUI.finishedWithDisplayOverlay();
         Vals.continueGameFlow = false;
-        switch (card.getID()){
+        switch (card.ID){
             case Vals.ONE_QUIET_NIGHT:
                 if(Vals.oneQuietNightActive) yield break;
                 Debug.Log("Playing One Quiet Night");
@@ -33,13 +34,14 @@ public class EventCardHandler : MonoBehaviour
                 break;
             case Vals.RESILIENT_POPULATION:
                 Debug.Log("Playing Resilient Population");
-                if (board.getInfectionDiscardPile().Count > 0){
+                if (board.InfectionDiscardPile.Count > 0){
                     yield return StartCoroutine(resilientPopulation());     
                 }
                 Vals.continueGameFlow = true;
                 break;
             case Vals.FORECAST:
                 Debug.Log("Playing Forecast");
+                undoObject.recordGameState();
                 yield return StartCoroutine(forecast());
 
                 Vals.continueGameFlow = true;
@@ -57,14 +59,14 @@ public class EventCardHandler : MonoBehaviour
     private IEnumerator resilientPopulation(){
         List<InfectionCard> selected = new List<InfectionCard>();
         string message = Strings.RESILIENT_POPULATION;
-        yield return StartCoroutine(overlayUI.requestMultiSelect(board.getInfectionDiscardPile(), selected, Vals.SELECTABLE_INFECTION_CARD, 1, null, message));
+        yield return StartCoroutine(overlayUI.requestMultiSelect(board.InfectionDiscardPile, selected, Vals.SELECTABLE_INFECTION_CARD, 1, null, message));
         board.removeInfectionCardFromDiscard(selected[0]);
     }
 
     private IEnumerator forecast(){
         Debug.Log("forecast executing");
         List<InfectionCard> top6Cards = new List<InfectionCard>();
-        Stack<InfectionCard> infectionDeck = board.getInfectionDeck();
+        Stack<InfectionCard> infectionDeck = board.InfectionDeck;
         
         for (int i = 0; i < 6; i++){
             top6Cards.Add(infectionDeck.Pop());

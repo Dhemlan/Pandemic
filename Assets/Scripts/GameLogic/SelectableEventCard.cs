@@ -21,7 +21,7 @@ public class SelectableEventCard : MonoBehaviour, ISelectable<PlayerCard>
     
     public void populateItemData(PlayerCard card){
         this.card = card;
-        label.text = card.getName();
+        label.text = card.Name;
     }
 
     public PlayerCard getSelectedValue(){

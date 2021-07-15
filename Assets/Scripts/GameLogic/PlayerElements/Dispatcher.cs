@@ -11,7 +11,7 @@ public class Dispatcher : Role
 
     public override bool nonStandardMove(Player player, Location dest){
         Debug.Log("dispatcher move");
-        if (dest.getLocalPlayers().Count > 0){
+        if (dest.LocalPlayers.Count > 0){
             return true;
         }
         return false;

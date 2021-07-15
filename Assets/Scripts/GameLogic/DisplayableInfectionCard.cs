@@ -11,11 +11,11 @@ public class DisplayableInfectionCard : MonoBehaviour, ISelectable<InfectionCard
 
     public void populateItemData(InfectionCard card){
         this.card = card;
-        label.text = card.getName();
+        label.text = card.Name;
     }
 
     public Sprite getSprite(){
-        return sprites[(int)card.getColour()];
+        return sprites[(int)card.Colour];
     }
 
     public bool isSelected(){

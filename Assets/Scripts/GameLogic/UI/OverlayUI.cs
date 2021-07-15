@@ -16,6 +16,7 @@ public class OverlayUI : MonoBehaviour{
     private BoxCollider2D[] boxColliders;
     private CircleCollider2D[] circleColliders;
     
+    
     public GameObject displayOverlayPrefabsParent;
     public GameObject selectionOverlayPrefabsParent;
     public GameObject[] displayablePrefabs;
@@ -30,21 +31,9 @@ public class OverlayUI : MonoBehaviour{
     public Image toastPanel;
     public Text toastMessage;
 
-    public void displayInteractables<T>(GameObject itemLocation, List<T> itemsToDisplay, List<GameObject> displayedObjects, int prefabCategory){
-        int gap = 2;
-        int itemsCount = itemsToDisplay.Count;
-        float prefabWidth = displayablePrefabs[prefabCategory].GetComponent<Renderer>().bounds.size.x;
-        float position = (itemsCount % 2 == 0) ? -((itemsCount / 2 - 1) * (prefabWidth + gap) + (prefabWidth + gap)/2) : -(itemsCount / 2 * (prefabWidth + gap));
+    public Button[] uiButtons;
 
-        foreach (T itemToDisplay in itemsToDisplay){
-            GameObject displayedObject = Instantiate(displayablePrefabs[prefabCategory], new Vector3(position,0,0), Quaternion.identity, itemLocation.transform);
-            ISelectable<T> selectableItem = displayedObject.GetComponent<ISelectable<T>>();
-            selectableItem.populateItemData(itemToDisplay);
-            displayedObject.GetComponent<SpriteRenderer>().sprite = selectableItem.getSprite();
-            displayedObjects.Add(displayedObject);
-            position += prefabWidth + gap;
-        } 
-    }
+ 
 
     public List<GameObject> displaySelectableItems<T>(List<T> itemsToDisplay, GameObject prefab, GameObject overlayLocation){
         List<GameObject> toReturn = new List<GameObject>();
@@ -61,7 +50,9 @@ public class OverlayUI : MonoBehaviour{
             if (position < 0) position *= -1;
             else position = -(position + width);
         }
-        overlayLocation.GetComponent<RectTransform>().sizeDelta = new Vector2(position * scaleFactor * 3, 100);
+        RectTransform rectTransform = overlayLocation.GetComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(position * scaleFactor * 3, 100);
+        rectTransform.position = Vector3.zero;
         return toReturn;
     }
 
@@ -167,7 +158,7 @@ public class OverlayUI : MonoBehaviour{
         if (typeToSelect == null){
             remainderToSelect -=amount;
         }
-        else if (card.getColour() == typeToSelect){
+        else if (card.Colour == typeToSelect){
             remainderToSelect -= amount;
         }
     }
@@ -175,6 +166,13 @@ public class OverlayUI : MonoBehaviour{
     private void setBoardInteractions(bool value){
         setBoxColliders(value);
         setCircleColliders(value);
+        //setButtons(value);
+    }
+
+    private void setButtons(bool value){
+        foreach (Button button in uiButtons){
+            button.enabled = value;
+        }
     }
 
     private void setBoxColliders(bool value){
@@ -182,6 +180,7 @@ public class OverlayUI : MonoBehaviour{
             collider.enabled = value;
         }
     }
+
     private void setCircleColliders(bool value){
         foreach(CircleCollider2D collider in circleColliders){
             collider.enabled = value;

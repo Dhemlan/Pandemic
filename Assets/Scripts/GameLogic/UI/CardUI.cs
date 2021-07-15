@@ -43,18 +43,18 @@ public class CardUI : MonoBehaviour
         playerCard1.SetActive(true);
         playerCard2.SetActive(true);
         
-        yield return StartCoroutine(moveAndFlipCard(playerCard1.transform, mapCentreLeft, playerCardFaces[(int)card1.getColour()], new Vector3(1.5f,1.5f,1.5f)));
-        playerCard1Title.text = card1.getName();
-        yield return StartCoroutine(moveAndFlipCard(playerCard2.transform, mapCentreRight, playerCardFaces[(int)card2.getColour()], new Vector3(1.5f,1.5f,1.5f)));
-        playerCard2Title.text = card2.getName();
+        yield return StartCoroutine(moveAndFlipCard(playerCard1.transform, mapCentreLeft, playerCardFaces[(int)card1.Colour], new Vector3(1.5f,1.5f,1.5f)));
+        playerCard1Title.text = card1.Name;
+        yield return StartCoroutine(moveAndFlipCard(playerCard2.transform, mapCentreRight, playerCardFaces[(int)card2.Colour], new Vector3(1.5f,1.5f,1.5f)));
+        playerCard2Title.text = card2.Name;
         yield return new WaitForSeconds(Vals.GENERIC_WAIT_TIME);
-        if (card1.getName().Equals("Epidemic")){
+        if (card1.Name.Equals("Epidemic")){
             yield return StartCoroutine(moveAndShrinkCard(playerCard1.transform, playerDiscardCentre));
         }
         else {
             yield return StartCoroutine(moveAndShrinkCard(playerCard1.transform, handCentres[curPlayer.getTurnOrderPos() - 1]));
         }
-        if (card2.getName().Equals("Epidemic")){
+        if (card2.Name.Equals("Epidemic")){
             yield return StartCoroutine(moveAndShrinkCard(playerCard2.transform, playerDiscardCentre));
         }
         else {
@@ -116,11 +116,6 @@ public class CardUI : MonoBehaviour
         card.transform.rotation = target.rotation;
         card.transform.localScale = new Vector3(1,1,1);
         title.text= "";
-    }
-
-
-    public void requestUserSelectSingleSelectable<T>(List<T> itemsToDisplay, int prefabCategory, string message){
-
     }
 
 

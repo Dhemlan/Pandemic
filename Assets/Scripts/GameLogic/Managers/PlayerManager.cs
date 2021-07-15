@@ -25,6 +25,8 @@ public class PlayerManager : MonoBehaviour
 
     private System.Random rand = new System.Random();
 
+    public int CompletedActions { get => completedActions; set => completedActions = value; }
+
     public void generateCharacters(int count){
         populateAvailableRoles();
         for (int i = 0; i < count; i++){
@@ -61,19 +63,21 @@ public class PlayerManager : MonoBehaviour
     }
 
     public IEnumerator movePhase(){
-        completedActions = 0;
-        Debug.Log("Player " + curPlayer.getTurnOrderPos() + " in " + curPlayer.getLocation().getName());
+        CompletedActions = 0;
+        playerUI.toggleUndoActive(true);
+        Debug.Log("Player " + curPlayer.getTurnOrderPos() + " in " + curPlayer.CurLoc.retrieveLocName());
         maxActions = curPlayer.getMaxActions();
-        playerUI.updateActionCount(completedActions, maxActions);
-        yield return new WaitUntil(() => completedActions == maxActions);
+        playerUI.updateActionCount(CompletedActions, maxActions);
+        yield return new WaitUntil(() => CompletedActions == maxActions);
         board.promptDrawPhase();
         yield return new WaitUntil(() => proceedSwitch);
         proceedSwitch = false;
+        playerUI.toggleUndoActive(false);
     }
 
     public void incrementCompletedActions(){
-        completedActions++;
-        playerUI.updateActionCount(completedActions, maxActions);
+        CompletedActions++;
+        playerUI.updateActionCount(CompletedActions, maxActions);
     }
 
     public void endPlayerTurn(){
@@ -102,7 +106,7 @@ public class PlayerManager : MonoBehaviour
         foreach (Player player in activePlayerScripts){
             if(player.hasCard(card)){
                 removeCardFromHand(player, card, toDiscard);
-                Debug.Log("Discarding " + card.getName() + player);
+                Debug.Log("Discarding " + card.Name + player);
                 return true;
             }
         }
@@ -158,10 +162,10 @@ public class PlayerManager : MonoBehaviour
         if (userSelectedPlayer != null){
             playerMoving = userSelectedPlayer;
         }
-        if (playerMoving.getLocation() == loc){
+        if (playerMoving.CurLoc == loc){
             // dispatcher attempts to move other to other's cur location
         }
-        else if (playerMoving.getLocation().getResearchStationStatus() && loc.getResearchStationStatus()){
+        else if (playerMoving.CurLoc.ResearchStationStatus && loc.ResearchStationStatus){
             Debug.Log("shuttle flight");
             playerLeavesLocation(playerMoving);
             playerMoving.shuttleFlightAction(loc);
@@ -174,7 +178,7 @@ public class PlayerManager : MonoBehaviour
             playerEntersLocation(playerMoving, loc);
         }
         else {
-            Location curLoc = actionTaker.getLocation();
+            Location curLoc = actionTaker.CurLoc;
             yield return StartCoroutine(actionTaker.otherMovement(loc, (movementCompleted) =>{
                 if (movementCompleted){
                     playerLeavesLocation(playerMoving);
@@ -187,8 +191,8 @@ public class PlayerManager : MonoBehaviour
     }
 
     public void playerLeavesLocation(Player player){
-        player.getLocation().playerLeaves(player);
-        playerUI.updatePawns(player.getLocation());
+        player.CurLoc.playerLeaves(player);
+        playerUI.updatePawns(player.CurLoc);
         player.leaveLocation();
     }
 
@@ -214,14 +218,14 @@ public class PlayerManager : MonoBehaviour
     }
 
     public bool actionAvailable(){
-        if(completedActions < curPlayer.getMaxActions()){
+        if(CompletedActions < curPlayer.getMaxActions()){
             return true;
         }
         return false;
     }
 
     public Location getCurPlayerLocation(){
-        return curPlayer.getLocation();
+        return curPlayer.CurLoc;
     }
 
     public Player getCurPlayer(){
@@ -237,11 +241,11 @@ public class PlayerManager : MonoBehaviour
     }
     public void placePawn(Player player){
         playerUI.placePawn(player);
-        playerUI.updatePawns(player.getLocation());
+        //playerUI.updatePawns(player.CurLoc);
     }
 
     public void endActionPhase(){
-        completedActions = maxActions;
+        CompletedActions = maxActions;
         proceedSwitch = true;
     }
 
@@ -269,7 +273,7 @@ public class PlayerManager : MonoBehaviour
 
     public void airlift(Location dest){
         playerLeavesLocation(userSelectedPlayer);
-        userSelectedPlayer.setCurLoc(dest);
+        userSelectedPlayer.CurLoc = dest;
         playerEntersLocation(userSelectedPlayer, dest);
         userSelectedPlayer = null;  
     }
@@ -286,7 +290,7 @@ public class PlayerManager : MonoBehaviour
     public void cureOccurs(Vals.Colour colour){
         foreach(Player player in activePlayerScripts){
             if(player.getRoleID() == Vals.MEDIC){
-                board.removeCubes(player.getLocation(), colour);
+                board.removeCubes(player.CurLoc, colour);
             }
         }
     }
@@ -299,5 +303,14 @@ public class PlayerManager : MonoBehaviour
             }
         }
         return otherPlayers;
+    }
+
+    public void reloadPlayerUI(){
+        playerUI.updateActionCount(completedActions, curPlayer.getMaxActions());
+        foreach(Player player in activePlayerScripts){
+            Debug.Log(player + " updating hand and position");
+            updateHand(player);
+            placePawn(player);
+        }
     }
 }

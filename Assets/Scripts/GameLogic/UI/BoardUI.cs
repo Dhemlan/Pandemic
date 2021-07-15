@@ -15,9 +15,9 @@ public class BoardUI : MonoBehaviour
     public GameObject[] cureTokens;
     public Sprite[] curedSprites;
     public Sprite[] eradicatedSprites;
+    public Sprite[] uncuredSprites;
 
     public Button drawButton;
-    public GameObject continueButton;
     public Slider continueInfectionSlider;
 
     public void boardSetUp(int playerDeckCount){
@@ -34,16 +34,16 @@ public class BoardUI : MonoBehaviour
         infectionRateMarker.transform.localPosition = Vector3.zero;
     }
 
-    public IEnumerator addCube(Location loc, Vals.Colour colour){
+    public void addCube(Location loc, Vals.Colour colour){
         GameObject diseaseCube = Instantiate(diseaseCubePrefab, new Vector3(10,10,0), Quaternion.identity, loc.transform);
-        diseaseCube.GetComponent<DiseaseCubeRotator>().setColour(colour);
+        diseaseCube.GetComponent<DiseaseCubeRotator>().Colour = colour;
         SpriteRenderer renderer = diseaseCube.GetComponent<SpriteRenderer>();
         renderer.sprite = diseaseCubeSprites[(int)colour];
         //renderer.sortingOrder = 4;
         
         initiateCubeMovement(loc);
-        yield return new WaitForSeconds(.3f);
     }
+
 
     public void initiateCubeMovement(Location loc){
         DiseaseCubeRotator[] cubes = loc.transform.GetComponentsInChildren<DiseaseCubeRotator>();
@@ -53,14 +53,21 @@ public class BoardUI : MonoBehaviour
             float bufferDistance = 1.8f;
             cube.transform.position = new Vector3(loc.transform.position.x - bufferDistance * Mathf.Cos(theta), loc.transform.position.y - bufferDistance * Mathf.Sin(theta), 0);
             i++;
-            adjustCubeSpeed(cube, cubes.Length);
         }
+        adjustSpeedForAllCubes(loc); // outside loop (instead of per cube) to maintain appropriate cube speed urgency with mixed cube colours
     }
 
     public void adjustSpeedForAllCubes(Location loc){
-        DiseaseCubeRotator[] cubes = loc.transform.GetComponentsInChildren<DiseaseCubeRotator>();
-        foreach(DiseaseCubeRotator cube in cubes){
-            adjustCubeSpeed(cube, cubes.Length);
+        int[] cubes = loc.DiseaseCubes;
+        int count = 0;
+        for (int i = 0; i < cubes.Length; i++){
+            if (cubes[i] > count){
+                count = cubes[i];
+            }
+        }
+        DiseaseCubeRotator[] cubeObjects = loc.transform.GetComponentsInChildren<DiseaseCubeRotator>();
+        foreach(DiseaseCubeRotator cube in cubeObjects){
+            adjustCubeSpeed(cube, count);
         }
     }
 
@@ -71,8 +78,7 @@ public class BoardUI : MonoBehaviour
 
     public void removeCube(Location loc, Vals.Colour colour){
         foreach(DiseaseCubeRotator cube in loc.transform.GetComponentsInChildren<DiseaseCubeRotator>()){
-            Debug.Log(loc.transform.GetComponentsInChildren<DiseaseCubeRotator>().Length);
-            if (cube.getColour() == colour){
+            if (cube.Colour == colour){
                 cube.transform.SetParent(this.transform); //to ensure next Destroy isn't called on same object before frame updates
                 Debug.Log("Destroying UI cube " + colour);
                 Destroy(cube.gameObject);
@@ -94,21 +100,51 @@ public class BoardUI : MonoBehaviour
         drawButton.gameObject.SetActive(true);
     }
 
-    public void diseaseCured(Vals.Colour colour){
-        cureTokens[(int)colour].GetComponent<SpriteRenderer>().sprite = curedSprites[(int)colour];
-    }
+    public void updateDiseaseStatus(Vals.Colour colour, int status){
+        if(status == Vals.DISEASE_CURED){
+            cureTokens[(int)colour].GetComponent<SpriteRenderer>().sprite = curedSprites[(int)colour];
+        }
+        else if (status == Vals.DISEASE_ERADICATED) {
+            cureTokens[(int)colour].GetComponent<SpriteRenderer>().sprite = eradicatedSprites[(int)colour];
+        }
+        else {
+            cureTokens[(int)colour].GetComponent<SpriteRenderer>().sprite = uncuredSprites[(int)colour];
+        }
 
-    public void diseaseEradicated(Vals.Colour colour){
-        cureTokens[(int)colour].GetComponent<SpriteRenderer>().sprite = eradicatedSprites[(int)colour];
     }
 
     public void toggleResearchStation(Location loc){
         SpriteRenderer station = loc.transform.Find("ResearchStation").GetComponent<SpriteRenderer>();
-        station.enabled = !station.enabled;
+        station.enabled = loc.ResearchStationStatus;
     }
 
     public bool confirmInfectionPhase(){
         if (continueInfectionSlider.value == 0) return false;
         return true;
+    }
+
+    public void updateDiseaseCubeSupply(int[] supply){
+        for (int i = 0; i < cubeReserveText.Length; i++){
+            cubeReserveText[i].text = supply[i] + "";
+        }
+    }
+
+    public void updateCubes(Location loc){
+        int[] currentDisplayedCubes = new int[Vals.DISEASE_COUNT];
+        foreach (DiseaseCubeRotator cube in loc.transform.GetComponentsInChildren<DiseaseCubeRotator>()){
+             currentDisplayedCubes[(int)cube.Colour]++;
+        }
+        int[] locCubes = loc.DiseaseCubes;
+        for (int i = 0; i < currentDisplayedCubes.Length; i++){
+            int j = currentDisplayedCubes[i];
+            while (j > locCubes[i]){
+                removeCube(loc, (Vals.Colour)i);
+                j--;
+            }
+            while (j < locCubes[i]){
+                addCube(loc, (Vals.Colour)i);
+                j++;
+            }
+        }
     }
 }

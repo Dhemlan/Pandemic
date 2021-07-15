@@ -8,28 +8,34 @@ public class GameFlowManager : MonoBehaviour
 {
     public Board board;
     public PlayerManager playerManager;
+    public GameObject locations;
+    public UndoObject undoObject;
 
     private int characterCount = 2;
     private int epidemicCardCount = 6;
     private Vals.Phase phase;
 
     void Start()
-    {       
+    {   
+        SaveSystem.init();
         StartCoroutine(gameFlow());
         DontDestroyOnLoad(gameObject);
     }
 
     private IEnumerator gameFlow(){      
         phase = Vals.Phase.SET_UP;
-        yield return StartCoroutine(board.boardSetUp(epidemicCardCount));  
+        yield return StartCoroutine(board.boardSetUp(epidemicCardCount));
+        InfectionPhaseOrchestrator infectionPhaseOrchestrator = GetComponent<InfectionPhaseOrchestrator>();
+        DrawPhaseOrchestrator drawPhaseOrchestrator = GetComponent<DrawPhaseOrchestrator>();
         while (true){
+            recordGameState();
             phase = Vals.Phase.ACTION;
             yield return StartCoroutine(playerManager.movePhase());
             phase = Vals.Phase.DRAW;
-            yield return StartCoroutine(board.drawPhase());
+            yield return StartCoroutine(drawPhaseOrchestrator.drawPhase());
             yield return new WaitUntil(() => Vals.continueGameFlow);
             phase = Vals.Phase.INFECTION;
-            yield return StartCoroutine(board.infectionPhase());
+            yield return StartCoroutine(infectionPhaseOrchestrator.infectionPhase());
             
             playerManager.endPlayerTurn();
         }
@@ -61,4 +67,29 @@ public class GameFlowManager : MonoBehaviour
                 break;
         }
     }
+    
+    public void recordGameState(){
+        undoObject.recordGameState();
+    }
+
+
+    /*
+    public void recordGameState(){
+        SaveObject gameState = new SaveObject(board, GameObject.Find("Locations").GetComponentsInChildren<Location>());
+        string json = JsonUtility.ToJson(gameState);
+        Debug.Log(json);
+        SaveSystem.save(json);
+    }
+
+    public void load(){
+        string load = SaveSystem.load();
+        if(load == null){
+            Debug.Log("error loading");
+        }
+        else {
+            SaveObject gameState = JsonUtility.FromJson<SaveObject>(load);
+            gameState.loadValues(board);
+        }
+
+    } */
 }

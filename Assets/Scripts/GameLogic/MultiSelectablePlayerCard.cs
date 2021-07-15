@@ -22,7 +22,7 @@ public class MultiSelectablePlayerCard : MonoBehaviour, ISelectable<PlayerCard>
     
     public void populateItemData(PlayerCard card){
         this.card = card;
-        label.text = card.getName();
+        label.text = card.Name;
     }
 
     public PlayerCard getSelectedValue(){
@@ -30,7 +30,7 @@ public class MultiSelectablePlayerCard : MonoBehaviour, ISelectable<PlayerCard>
     }
 
     public Sprite getSprite(){
-        return sprites[(int)card.getColour()];
+        return sprites[(int)card.Colour];
     }
 
     public bool isSelected(){

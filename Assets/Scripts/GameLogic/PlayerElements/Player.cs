@@ -6,35 +6,39 @@ using System;
 public class Player : MonoBehaviour
 {
     public PlayerManager playerManager;
-    
+    public Board board;
+
     public int turnOrderPos;
-    private Role role;
-    private Location curLoc;
     public Location startingLoc;
-    public List<PlayerCard> hand = new List<PlayerCard>();
+    private Role role;
     private int handLimit = Vals.DEFAULT_HAND_LIMIT;
     private int maxActions = 4;
 
+    private Location curLoc;
+    private List<PlayerCard> hand = new List<PlayerCard>();
+
     private PlayerCard cardToTrade;
-    public Board board;
     public GameObject boardPawn;
 
+    public Location CurLoc { get => curLoc; set => curLoc = value; }
+    public List<PlayerCard> Hand { get => hand; set => hand = value; }
+
     public void Awake(){
-        curLoc = startingLoc;
+        CurLoc = startingLoc;
         startingLoc.playerEnters(this);
     }
 
     public void addCardToHand(PlayerCard card){
-        hand.Add(card);
-        hand.Sort();   
+        Hand.Add(card);
+        Hand.Sort();   
     }
 
     public void removeCardFromHand(PlayerCard card){
-        hand.Remove(card); 
+        Hand.Remove(card); 
     }
 
     public void discardCard(PlayerCard card){
-        hand.Remove(card); 
+        Hand.Remove(card); 
     }
 
     public void treatAction(Location loc, Vals.Colour colour){
@@ -55,7 +59,7 @@ public class Player : MonoBehaviour
     }
 
     public bool isDriveFerryValid(Location dest){
-        return curLoc.hasNeighbour(dest);
+        return CurLoc.hasNeighbour(dest);
     }
 
     public void driveFerryAction(Location dest){
@@ -82,8 +86,8 @@ public class Player : MonoBehaviour
     }
 
     public IEnumerator otherMovement(Location dest, System.Action<bool> callback){
-        if (role.nonStandardMove(this,dest)){
-            if (role.getID() == Vals.OPERATIONS_EXPERT){
+        if (role.nonStandardMove(this, dest)){
+            if (role.ID == Vals.OPERATIONS_EXPERT){
                 List<PlayerCard> selectedCard = new List<PlayerCard>();
                 yield return StartCoroutine(playerManager.requestUserSelectCard(getHandWithoutEvents(), selectedCard, 1, null));
                 playerManager.removeCardFromHand(this, selectedCard[0], true);
@@ -93,7 +97,7 @@ public class Player : MonoBehaviour
             yield break;
         }
         List<PlayerCard> availableCards = new List<PlayerCard>();
-        PlayerCard currentLocCard = retrieveCardByLoc(curLoc);
+        PlayerCard currentLocCard = retrieveCardByLoc(CurLoc);
         availableCards.Add(currentLocCard);
         PlayerCard clickedLocCard = retrieveCardByLoc(dest);
         availableCards.Add(clickedLocCard);
@@ -108,7 +112,6 @@ public class Player : MonoBehaviour
             else{
                 commercialFlightAction(clickedLocCard, dest);
             }
-            moveCompleted();
             callback(true);
             yield break;
         }
@@ -128,16 +131,16 @@ public class Player : MonoBehaviour
     }
 
     public IEnumerator buildAction(){
-        if (curLoc.getResearchStationStatus()) yield break;
+        if (CurLoc.ResearchStationStatus) yield break;
         if (role.buildAction(this)){
-            yield return StartCoroutine(board.buildResearchStation(curLoc));
+            yield return StartCoroutine(board.buildResearchStation(CurLoc));
             playerManager.incrementCompletedActions();
         } 
     }
 
     public IEnumerator shareAction(){
         Debug.Log("Player share action");
-        List<Player> localPlayers = curLoc.getLocalPlayers();
+        List<Player> localPlayers = CurLoc.LocalPlayers;
         if (localPlayers.Count > 1){
             List<PlayerCard> potentialTradeableCards = new List<PlayerCard>();
             role.findGiveableCards(this, potentialTradeableCards);
@@ -156,7 +159,7 @@ public class Player : MonoBehaviour
                 }
                 else {
                     cardToTrade = potentialTradeableCards[0];
-                    Debug.Log("1b - trade " + cardToTrade.getName());
+                    Debug.Log("1b - trade " + cardToTrade.Name);
                 }
 
                 Player cardOwner = this;
@@ -203,23 +206,23 @@ public class Player : MonoBehaviour
         return standardCardsToCure - (standardCardsToCure - role.getCardsToCure());
     }
 
-    public Nullable<Vals.Colour> determineCureActionAvailable(int[] cardCureRequirements, bool researchStationAvailable){
+    public Nullable<Vals.Colour> determineCureActionAvailable(bool researchStationAvailable){
         if (researchStationAvailable){
             int[] cardsOfEachColour = new int[Vals.DISEASE_COUNT];
-            PlayerCard prev = hand[0];
+            PlayerCard prev = Hand[0];
             int colourCount = 1;
-            int cardsToCure = roleModifiedCardsToCure(cardCureRequirements[(int)prev.getColour()]);
-            for (int i = 1; i < hand.Count; i++){
-                if (hand[i].getColour() == prev.getColour() && !board.isDiseaseCured(hand[i].getColour())){
+            int cardsToCure = roleModifiedCardsToCure(Vals.DEFAULT_CARDS_TO_CURE);
+            for (int i = 1; i < Hand.Count; i++){
+                if (Hand[i].Colour == prev.Colour && !board.isDiseaseCured(Hand[i].Colour)){
                     colourCount++;
                     if (colourCount == cardsToCure){
-                        return prev.getColour();
+                        return prev.Colour;
                     }
                 }
                 else {
                     colourCount = 1;
                 }
-                prev = hand[i];
+                prev = Hand[i];
             }
         }
         return null;
@@ -230,14 +233,14 @@ public class Player : MonoBehaviour
     }
 
     public bool hasCard(PlayerCard card){
-        return hand.Contains(card);
+        return Hand.Contains(card);
     }
 
     public bool hasCardByLoc(Location loc){
-        foreach (PlayerCard card in hand){
-            Location cardLoc = card.getLocation();
+        foreach (PlayerCard card in Hand){
+            Location cardLoc = card.Location;
             if(cardLoc != null && cardLoc.Equals(loc)){
-                Debug.Log("has " + loc.getName());
+                Debug.Log("has " + loc.retrieveLocName());
                 return true;
             }
         }
@@ -245,8 +248,8 @@ public class Player : MonoBehaviour
     }
 
     public PlayerCard retrieveCardByLoc(Location loc){
-        foreach(PlayerCard card in hand){
-            Location cardLoc = card.getLocation();
+        foreach(PlayerCard card in Hand){
+            Location cardLoc = card.Location;
             if (cardLoc != null && cardLoc.Equals(loc)){
                 return card;
             }
@@ -259,16 +262,12 @@ public class Player : MonoBehaviour
     }
 
     public void enterLocation(Location dest){
-        curLoc = dest;
-        role.enterLocation(board, curLoc);
+        CurLoc = dest;
+        role.enterLocation(board, CurLoc);
     }
 
     public void resetOncePerTurnActions(){
         role.resetOncePerTurnActions();
-    }
-
-    public void setCurLoc(Location loc){
-        curLoc = loc;
     }
 
     public int getMaxActions(){
@@ -276,25 +275,21 @@ public class Player : MonoBehaviour
     }
 
     public int overHandLimit(){
-        return hand.Count - handLimit;
+        return Hand.Count - handLimit;
     }
 
     public int getTurnOrderPos(){
         return turnOrderPos;
     }
-
-    public Location getLocation(){
-        return curLoc;
-    }
     
     public List<PlayerCard> getHand(){
-        return hand;
+        return Hand;
     }
 
     public List<PlayerCard> getHandWithoutEvents(){
         List<PlayerCard> cards = new List<PlayerCard>();
-        foreach(PlayerCard card in hand){
-            if (card.getColour() != Vals.Colour.EVENT){
+        foreach(PlayerCard card in Hand){
+            if (card.Colour != Vals.Colour.EVENT){
                 cards.Add(card);
             }
         }
@@ -310,7 +305,7 @@ public class Player : MonoBehaviour
     }
 
     public int getRoleID(){
-        return role.getID();
+        return role.ID;
     }
 
     public GameObject getBoardPawn(){
